@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelaBR - Calculadora para Freelancers Brasileiros</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FreelaBR">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        /* PWA Install Button */
+        #installPrompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Offline indicator */
+        #offlineIndicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #f59e0b;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator">
+        📶 Você está offline. O app continuará funcionando!
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="installPrompt" class="bg-white rounded-lg shadow-2xl p-4 max-w-sm">
+        <div class="flex items-start gap-3">
+            <div class="text-4xl">📱</div>
+            <div class="flex-1">
+                <h3 class="font-bold text-gray-800 mb-1">Instalar FreelaBR</h3>
+                <p class="text-sm text-gray-600 mb-3">Adicione à tela inicial para acesso rápido!</p>
+                <div class="flex gap-2">
+                    <button id="installButton" class="gradient-bg text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
+                        Instalar
+                    </button>
+                    <button id="dismissButton" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300">
+                        Agora não
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold">🚀 FreelaBR</h1>
+            <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers Brasileiros</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Form - Left Side -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Seus Dados</h2>
+                
+                <form id="calculatorForm" class="space-y-6">
+                    <!-- Pró-labore -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            💰 Quanto você quer ganhar por mês? (Pró-labore)
+                        </label>
+                        <input type="number" id="monthlyIncome" value="5000" min="1000" step="100"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Horas/Dias -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                ⏰ Horas por dia
+                            </label>
+                            <input type="number" id="hoursPerDay" value="8" min="1" max="16"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                📅 Dias por semana
+                            </label>
+                            <input type="number" id="daysPerWeek" value="5" min="1" max="7"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <!-- Regime Tributário -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            🏛️ Regime Tributário
+                        </label>
+                        <select id="taxRegime"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="MEI">MEI - Microempreendedor Individual</option>
+                            <option value="PJ_SIMPLES">PJ - Simples Nacional</option>
+                            <option value="PJ_PRESUMIDO">PJ - Lucro Presumido</option>
+                            <option value="AUTONOMO">Autônomo (Pessoa Física)</option>
+                        </select>
+                        <p id="regimeInfo" class="text-xs text-gray-500 mt-1"></p>
+                    </div>
+
+                    <!-- Despesas -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                💸 Despesas Fixas/mês
+                            </label>
+                            <input type="number" id="monthlyExpenses" value="500" min="0" step="50"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-gray-500 mt-1">Internet, software, etc.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                💳 Despesas Variáveis/mês
+                            </label>
+                            <input type="number" id="variableExpenses" value="200" min="0" step="50"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-gray-500 mt-1">Transporte, materiais, etc.</p>
+                        </div>
+                    </div>
+
+                    <!-- Provisões -->
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="include13th" checked
+                                class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="ml-2 text-sm text-gray-700">Incluir 13º salário</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeVacation" checked
+                                class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="ml-2 text-sm text-gray-700">Incluir férias + 1/3</span>
+                        </label>
+                    </div>
+
+                    <!-- Margem de Lucro -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            📈 Margem de Lucro: <span id="profitMarginValue">20</span>%
+                        </label>
+                        <input type="range" id="profitMargin" min="0" max="50" value="20"
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-gray-500 mt-1">Recomendado: 15-30%</p>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full gradient-bg text-white font-semibold py-3 rounded-lg hover:opacity-90 transition">
+                        🧮 Calcular Valores
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results - Right Side -->
+            <div id="resultsSection" class="space-y-4 hidden">
+                <!-- Valores Principais -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">✅ Seus Valores</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
+                            <p class="text-sm text-purple-600 font-medium">POR HORA</p>
+                            <p class="text-3xl font-bold text-purple-900" id="hourlyRate">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
+                            <p class="text-sm text-blue-600 font-medium">POR DIA</p>
+                            <p class="text-3xl font-bold text-blue-900" id="dailyRate">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                            <p class="text-sm text-green-600 font-medium">POR SEMANA</p>
+                            <p class="text-3xl font-bold text-green-900" id="weeklyRate">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg">
+                            <p class="text-sm text-orange-600 font-medium">POR MÊS</p>
+                            <p class="text-3xl font-bold text-orange-900" id="monthlyRate">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projetos Sugeridos -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📦 Valores para Projetos</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Pequeno (30h)</span>
+                            <span class="font-bold text-gray-900" id="smallProject">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Médio (100h)</span>
+                            <span class="font-bold text-gray-900" id="mediumProject">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Grande (200h)</span>
+                            <span class="font-bold text-gray-900" id="largeProject">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown de Custos -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Detalhamento</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Pró-labore desejado:</span>
+                            <span class="font-semibold" id="netIncome">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Impostos mensais:</span>
+                            <span class="font-semibold text-red-600" id="monthlyTaxes">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Provisões (13º + férias):</span>
+                            <span class="font-semibold" id="provisions">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Despesas totais:</span>
+                            <span class="font-semibold" id="totalExpenses">R$ 0,00</span>
+                        </div>
+                        <div class="border-t pt-2 flex justify-between">
+                            <span class="text-gray-800 font-bold">Custo Total/Mês:</span>
+                            <span class="font-bold text-purple-600" id="totalMonthlyCost">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Horas trabalhadas/mês:</span>
+                            <span id="workingHours">0h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p>Made with ❤️ by <strong>MiniMax Agent</strong></p>
+            <p class="text-gray-400 text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                        
+                        // Verificar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nova versão disponível
+                                    if (confirm('Nova versão disponível! Atualizar agora?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Erro ao registrar Service Worker:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+        const dismissButton = document.getElementById('dismissButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevenir prompt automático
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação personalizado
+            installPrompt.style.display = 'block';
+            
+            // Esconder após 10 segundos se não interagir
+            setTimeout(() => {
+                if (installPrompt.style.display === 'block') {
+                    installPrompt.style.display = 'none';
+                }
+            }, 10000);
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            console.log(`Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar`);
+            
+            deferredPrompt = null;
+            installPrompt.style.display = 'none';
+        });
+
+        dismissButton.addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+        });
+
+        // Detectar se está rodando como PWA
+        window.addEventListener('load', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                console.log('🚀 Rodando como PWA instalado!');
+                // Esconder botão de instalação se já estiver instalado
+                installPrompt.style.display = 'none';
+            }
+        });
+
+        // Detectar status online/offline
+        const offlineIndicator = document.getElementById('offlineIndicator');
+
+        window.addEventListener('online', () => {
+            offlineIndicator.style.display = 'none';
+            console.log('✅ Conexão restaurada');
+        });
+
+        window.addEventListener('offline', () => {
+            offlineIndicator.style.display = 'block';
+            console.log('⚠️ Sem conexão - modo offline ativado');
+        });
+
+        // Verificar status inicial
+        if (!navigator.onLine) {
+            offlineIndicator.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
