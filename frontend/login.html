@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,6 +40,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -191,7 +193,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .password-toggle {
@@ -215,13 +219,14 @@
             .login-container {
                 padding: 30px 20px;
             }
-            
+
             .logo h1 {
                 font-size: 28px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="logo">
@@ -234,27 +239,14 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">E-mail</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required 
-                    placeholder="seu@email.com"
-                    autocomplete="email"
-                >
+                <input type="email" id="email" name="email" required placeholder="seu@email.com" autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="password">Senha</label>
                 <div class="password-toggle">
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        required 
-                        placeholder="••••••••"
-                        autocomplete="current-password"
-                    >
+                    <input type="password" id="password" name="password" required placeholder="••••••••"
+                        autocomplete="current-password">
                     <button type="button" class="password-toggle-btn" id="togglePassword">
                         👁️
                     </button>
@@ -276,45 +268,47 @@
     <script src="auth.js"></script>
     <script>
         // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
             this.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // Se já está autenticado, redireciona
-        if (auth.isAuthenticated()) {
-            window.location.href = '/index.html';
-        }
+        // Se já está autenticado, redireciona para calculadora
+        redirectIfAuthenticated();
 
         // Handle form submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
             const loginBtn = document.getElementById('loginBtn');
-            
+
             // Clear previous errors
             errorMessage.classList.remove('show');
-            
+
             // Disable button and show loading
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="loading"></span> Entrando...';
-            
+
             try {
-                await auth.login(email, password);
-                
-                // Success! Redirect to calculator
-                window.location.href = '/index.html';
-                
+                const result = await login(email, password);
+
+                if (result.success) {
+                    // Success! Redirect to calculator
+                    window.location.href = '/index.html';
+                } else {
+                    throw new Error(result.error);
+                }
+
             } catch (error) {
                 // Show error
                 errorMessage.textContent = error.message || 'Erro ao fazer login. Tente novamente.';
                 errorMessage.classList.add('show');
-                
+
                 // Re-enable button
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Entrar';
@@ -323,8 +317,7 @@
 
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+            navigator.serviceWorker.register('/service-worker.js').catch(() => { });
         }
     </script>
 </body>
-</html>
