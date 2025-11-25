@@ -1,159 +1,154 @@
-// Configuração da API
-const API_URL = 'http://localhost:8000';  // Mude para sua URL de produção
-
-// Gerenciamento de Token
-const TokenManager = {
-    get() {
-        return localStorage.getItem('freelabr_token');
-    },
-    
-    set(token) {
-        localStorage.setItem('freelabr_token', token);
-    },
-    
-    remove() {
-        localStorage.removeItem('freelabr_token');
-        localStorage.removeItem('freelabr_user');
-    },
-    
-    getUser() {
-        const userStr = localStorage.getItem('freelabr_user');
-        return userStr ? JSON.parse(userStr) : null;
-    },
-    
-    setUser(user) {
-        localStorage.setItem('freelabr_user', JSON.stringify(user));
-    }
+// Configuração da API - detecta automaticamente o ambiente
+const API_CONFIG = {
+    // Em produção: usa o backend do Render
+    // Em desenvolvimento: usa localhost
+    BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8000'
+        : 'https://freelabr-backend.onrender.com'
 };
 
-// Classe de Autenticação
-class Auth {
-    constructor() {
-        this.token = TokenManager.get();
-        this.user = TokenManager.getUser();
+// Função auxiliar para fazer requisições à API
+async function apiRequest(endpoint, options = {}) {
+    const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    // Adiciona token se existir
+    const token = getToken();
+    if (token) {
+        defaultOptions.headers['Authorization'] = `Bearer ${token}`;
     }
-    
-    isAuthenticated() {
-        return !!this.token;
+
+    const finalOptions = { ...defaultOptions, ...options };
+
+    // Merge headers se options.headers existir
+    if (options.headers) {
+        finalOptions.headers = { ...defaultOptions.headers, ...options.headers };
     }
-    
-    async register(fullName, email, password) {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    full_name: fullName,
-                    email: email,
-                    password: password
-                })
-            });
-            
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Erro ao registrar');
-            }
-            
-            const data = await response.json();
-            
-            // Salva token e usuário
-            TokenManager.set(data.access_token);
-            TokenManager.setUser(data.user);
-            
-            this.token = data.access_token;
-            this.user = data.user;
-            
-            return data;
-        } catch (error) {
-            console.error('Erro no registro:', error);
-            throw error;
-        }
+
+    const response = await fetch(url, finalOptions);
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Erro na requisição' }));
+        throw new Error(error.detail || 'Erro na requisição');
     }
-    
-    async login(email, password) {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Erro ao fazer login');
-            }
-            
-            const data = await response.json();
-            
-            // Salva token e usuário
-            TokenManager.set(data.access_token);
-            TokenManager.setUser(data.user);
-            
-            this.token = data.access_token;
-            this.user = data.user;
-            
-            return data;
-        } catch (error) {
-            console.error('Erro no login:', error);
-            throw error;
-        }
-    }
-    
-    async getMe() {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/me`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Token inválido');
-            }
-            
-            const user = await response.json();
-            TokenManager.setUser(user);
-            this.user = user;
-            
-            return user;
-        } catch (error) {
-            console.error('Erro ao verificar token:', error);
-            this.logout();
-            throw error;
-        }
-    }
-    
-    logout() {
-        TokenManager.remove();
-        this.token = null;
-        this.user = null;
-        window.location.href = '/login.html';
-    }
-    
-    requireAuth() {
-        if (!this.isAuthenticated()) {
-            window.location.href = '/login.html';
-            return false;
-        }
-        return true;
-    }
-    
-    getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
-        };
+
+    return response.json();
+}
+
+// Função de login
+async function login(email, password) {
+    try {
+        // FormData para enviar como application/x-www-form-urlencoded
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        const data = await apiRequest('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData,
+        });
+
+        // Salva o token
+        localStorage.setItem('access_token', data.access_token);
+
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, error: error.message };
     }
 }
 
-// Instância global
-const auth = new Auth();
+// Função de registro
+async function register(email, password, fullName) {
+    try {
+        const data = await apiRequest('/api/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                email,
+                password,
+                full_name: fullName,
+            }),
+        });
 
-// Exportar para uso em outros scripts
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { Auth, auth, TokenManager, API_URL };
+        // Após registro bem-sucedido, faz login automaticamente
+        const loginResult = await login(email, password);
+
+        return loginResult;
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+// Função para obter dados do usuário
+async function getCurrentUser() {
+    try {
+        const data = await apiRequest('/api/auth/me');
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+// Função de logout
+function logout() {
+    localStorage.removeItem('access_token');
+    window.location.href = '/login.html';
+}
+
+// Função para obter o token
+function getToken() {
+    return localStorage.getItem('access_token');
+}
+
+// Função para verificar se está autenticado
+function isAuthenticated() {
+    return !!getToken();
+}
+
+// Função para redirecionar se não estiver autenticado
+function redirectIfNotAuthenticated() {
+    if (!isAuthenticated()) {
+        window.location.href = '/login.html';
+    }
+}
+
+// Função para redirecionar se já estiver autenticado
+function redirectIfAuthenticated() {
+    if (isAuthenticated()) {
+        window.location.href = '/index.html';
+    }
+}
+
+// Função para exibir nome do usuário
+async function displayUserName() {
+    const userNameElement = document.getElementById('user-name');
+    if (!userNameElement) return;
+
+    const result = await getCurrentUser();
+    if (result.success) {
+        userNameElement.textContent = result.data.full_name;
+    } else {
+        // Se falhar ao obter usuário, faz logout
+        logout();
+    }
+}
+
+// Função para calcular valores
+async function calculateValues(data) {
+    try {
+        const result = await apiRequest('/api/calculator/calculate', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+        return { success: true, data: result };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
 }
