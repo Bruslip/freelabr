@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freelabr-v1.1.0';
+const CACHE_NAME = 'freelabr-v1.2.0';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -60,11 +60,11 @@ self.addEventListener('fetch', (event) => {
       .then((response) => {
         // Clone a resposta antes de cachear
         const responseToCache = response.clone();
-        
+
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
         });
-        
+
         return response;
       })
       .catch(() => {
@@ -74,7 +74,7 @@ self.addEventListener('fetch', (event) => {
             if (response) {
               return response;
             }
-            
+
             // Página offline personalizada (opcional)
             if (event.request.mode === 'navigate') {
               return caches.match('/index.html');
