@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreelaBR - Calculadora para Freelancers Brasileiros</title>
-    
+
     <!-- PWA Meta Tags -->
-    <meta name="description" content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
+    <meta name="description"
+        content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FreelaBR">
-    
+
     <!-- PWA Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
     <link rel="apple-touch-icon" href="/icon-192.png">
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
         /* PWA Install Button */
         #installPrompt {
             position: fixed;
@@ -34,7 +42,7 @@
             z-index: 1000;
             display: none;
         }
-        
+
         /* Offline indicator */
         #offlineIndicator {
             position: fixed;
@@ -51,6 +59,7 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Offline Indicator -->
     <div id="offlineIndicator">
@@ -65,10 +74,12 @@
                 <h3 class="font-bold text-gray-800 mb-1">Instalar FreelaBR</h3>
                 <p class="text-sm text-gray-600 mb-3">Adicione à tela inicial para acesso rápido!</p>
                 <div class="flex gap-2">
-                    <button id="installButton" class="gradient-bg text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
+                    <button id="installButton"
+                        class="gradient-bg text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
                         Instalar
                     </button>
-                    <button id="dismissButton" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300">
+                    <button id="dismissButton"
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300">
                         Agora não
                     </button>
                 </div>
@@ -82,14 +93,15 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold">🚀 FreelaBR</h1>
-                    <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers Brasileiros</p>
+                    <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden md:block">
                         <p class="text-sm text-purple-100">Olá,</p>
                         <p class="font-semibold" id="userName">Carregando...</p>
                     </div>
-                    <button id="logoutBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
+                    <button id="logoutBtn"
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
                         Sair
                     </button>
                 </div>
@@ -103,7 +115,7 @@
             <!-- Form - Left Side -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Seus Dados</h2>
-                
+
                 <form id="calculatorForm" class="space-y-6">
                     <!-- Pró-labore -->
                     <div>
@@ -203,7 +215,7 @@
                 <!-- Valores Principais -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">✅ Seus Valores</h2>
-                    
+
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
                             <p class="text-sm text-purple-600 font-medium">POR HORA</p>
@@ -280,14 +292,13 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-6 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p>Made with ❤️ by <strong>MiniMax Agent</strong></p>
             <p class="text-gray-400 text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
         </div>
     </footer>
 
     <script src="auth.js"></script>
     <script src="app.js"></script>
-    
+
     <!-- Auth Check -->
     <script>
         // Verificar autenticação ao carregar
@@ -316,7 +327,7 @@
             }
         });
     </script>
-    
+
     <!-- PWA Service Worker Registration -->
     <script>
         // Registrar Service Worker
@@ -325,7 +336,7 @@
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('✅ Service Worker registrado:', registration.scope);
-                        
+
                         // Verificar atualizações
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
@@ -355,10 +366,10 @@
             // Prevenir prompt automático
             e.preventDefault();
             deferredPrompt = e;
-            
+
             // Mostrar botão de instalação personalizado
             installPrompt.style.display = 'block';
-            
+
             // Esconder após 10 segundos se não interagir
             setTimeout(() => {
                 if (installPrompt.style.display === 'block') {
@@ -369,12 +380,12 @@
 
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) return;
-            
+
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            
+
             console.log(`Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar`);
-            
+
             deferredPrompt = null;
             installPrompt.style.display = 'none';
         });
@@ -411,4 +422,5 @@
         }
     </script>
 </body>
+
 </html>
