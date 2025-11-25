@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials
 from app.models import CalculatorInput, CalculatorResult, UserCreate, User
@@ -27,14 +27,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configurar CORS
+# Configurar CORS - CORRIGIDO
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+allowed_origins = [
+    frontend_url,
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "https://freelabr.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        os.getenv("FRONTEND_URL", "http://localhost:5173"),
-        "http://localhost:3000",
-        "https://*.vercel.app",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,7 +130,10 @@ async def register(user_data: UserCreate):
         )
 
 @app.post("/api/auth/login")
-async def login(email: str, password: str):
+async def login(
+    username: str = Form(...),  # OAuth2 usa 'username' para email
+    password: str = Form(...)
+):
     """
     Faz login e retorna token JWT
     """
@@ -136,8 +144,8 @@ async def login(email: str, password: str):
         )
     
     try:
-        # Busca usuário
-        result = supabase.table("users").select("*").eq("email", email).execute()
+        # Busca usuário (username é o email)
+        result = supabase.table("users").select("*").eq("email", username).execute()
         
         if not result.data:
             raise HTTPException(
