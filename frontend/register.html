@@ -430,7 +430,7 @@
             registerBtn.innerHTML = '<span class="loading"></span> Criando conta...';
 
             try {
-                const result = await register(fullName, email, password);
+                const result = await register(email, password, fullName);
 
                 // Success!
                 successMessage.textContent = 'Conta criada com sucesso! Redirecionando...';
