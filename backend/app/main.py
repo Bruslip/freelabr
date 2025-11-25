@@ -1,11 +1,24 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
-from app.models import CalculatorInput, CalculatorResult
+from fastapi.security import HTTPAuthorizationCredentials
+from app.models import CalculatorInput, CalculatorResult, UserCreate, User
 from app.services.calculator_service import CalculatorService
+from app.services.auth_service import AuthService
+from app.dependencies import get_current_user, security
 import os
 from dotenv import load_dotenv
+from supabase import create_client, Client
+from datetime import timedelta
 
 load_dotenv()
+
+# Inicializar Supabase
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_ANON_KEY")
+supabase: Client = None
+
+if supabase_url and supabase_key:
+    supabase = create_client(supabase_url, supabase_key)
 
 # Inicializar FastAPI
 app = FastAPI(
@@ -45,16 +58,164 @@ async def health_check():
     return {
         "status": "healthy",
         "environment": os.getenv("ENVIRONMENT", "development"),
-        "database": "connected"  # Depois vamos adicionar check real do Supabase
+        "database": "connected" if supabase else "not_configured"
     }
+
+# ==================== AUTH ROUTES ====================
+
+@app.post("/api/auth/register")
+async def register(user_data: UserCreate):
+    """
+    Registra um novo usuário
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado. Configure SUPABASE_URL e SUPABASE_ANON_KEY"
+        )
+    
+    try:
+        # Verifica se email já existe
+        existing = supabase.table("users").select("*").eq("email", user_data.email).execute()
+        if existing.data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email já cadastrado"
+            )
+        
+        # Hash da senha
+        hashed_password = AuthService.get_password_hash(user_data.password)
+        
+        # Insere no banco
+        result = supabase.table("users").insert({
+            "email": user_data.email,
+            "full_name": user_data.full_name,
+            "hashed_password": hashed_password
+        }).execute()
+        
+        if not result.data:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao criar usuário"
+            )
+        
+        user = result.data[0]
+        
+        # Cria token
+        access_token = AuthService.create_access_token(
+            data={"sub": user["id"], "email": user["email"]}
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user["id"],
+                "email": user["email"],
+                "full_name": user["full_name"]
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao registrar: {str(e)}"
+        )
+
+@app.post("/api/auth/login")
+async def login(email: str, password: str):
+    """
+    Faz login e retorna token JWT
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    try:
+        # Busca usuário
+        result = supabase.table("users").select("*").eq("email", email).execute()
+        
+        if not result.data:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email ou senha incorretos"
+            )
+        
+        user = result.data[0]
+        
+        # Verifica senha
+        if not AuthService.verify_password(password, user["hashed_password"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email ou senha incorretos"
+            )
+        
+        # Cria token
+        access_token = AuthService.create_access_token(
+            data={"sub": user["id"], "email": user["email"]}
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user["id"],
+                "email": user["email"],
+                "full_name": user["full_name"]
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao fazer login: {str(e)}"
+        )
+
+@app.get("/api/auth/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """
+    Retorna informações do usuário logado
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    try:
+        result = supabase.table("users").select("id, email, full_name, created_at").eq("id", current_user["id"]).execute()
+        
+        if not result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado"
+            )
+        
+        return result.data[0]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao buscar usuário: {str(e)}"
+        )
 
 # ==================== CALCULATOR ROUTES ====================
 
 @app.post("/api/calculator/calculate", response_model=CalculatorResult)
-async def calculate_rates(input_data: CalculatorInput):
+async def calculate_rates(input_data: CalculatorInput, current_user: dict = Depends(get_current_user)):
     """
     Calcula valores de hora/dia/projeto para freelancer
     Considera impostos brasileiros (MEI, PJ, Autônomo)
+    
+    **Requer autenticação**
     """
     try:
         result = CalculatorService.calculate(input_data)

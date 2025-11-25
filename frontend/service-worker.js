@@ -1,8 +1,11 @@
-const CACHE_NAME = 'freelabr-v1.0.0';
+const CACHE_NAME = 'freelabr-v1.1.0';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/login.html',
+  '/register.html',
   '/app.js',
+  '/auth.js',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
@@ -45,6 +48,13 @@ self.addEventListener('activate', (event) => {
 
 // Interceptação de requisições (Estratégia: Network First, depois Cache)
 self.addEventListener('fetch', (event) => {
+  // Ignorar requisições de API - sempre buscar da rede
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Para outros recursos: Network First, depois Cache
   event.respondWith(
     fetch(event.request)
       .then((response) => {
