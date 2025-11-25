@@ -1,14 +1,12 @@
 from fastapi import FastAPI, HTTPException, Depends, status, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials
-from app.models import CalculatorInput, CalculatorResult, UserCreate, User
+from app.models import CalculatorInput, CalculatorResult, UserCreate
 from app.services.calculator_service import CalculatorService
 from app.services.auth_service import AuthService
-from app.dependencies import get_current_user, security
+from app.dependencies import get_current_user
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from datetime import timedelta
 
 load_dotenv()
 

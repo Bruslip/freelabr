@@ -296,34 +296,22 @@
         </div>
     </footer>
 
+    <!-- IMPORTANTE: auth.js deve ser carregado ANTES do app.js -->
     <script src="auth.js"></script>
     <script src="app.js"></script>
 
-    <!-- Auth Check -->
+    <!-- Auth Check - CORRIGIDO -->
     <script>
-        // Verificar autenticação ao carregar
-        if (!auth.requireAuth()) {
-            // Se não estiver autenticado, redireciona para login
-            // A função requireAuth já faz isso
-        } else {
-            // Carregar informações do usuário
-            const user = auth.user;
-            if (user && user.full_name) {
-                document.getElementById('userName').textContent = user.full_name.split(' ')[0]; // Primeiro nome
-            } else {
-                // Tentar buscar do servidor
-                auth.getMe().then(userData => {
-                    document.getElementById('userName').textContent = userData.full_name.split(' ')[0];
-                }).catch(() => {
-                    document.getElementById('userName').textContent = 'Usuário';
-                });
-            }
-        }
+        // Proteger a rota - redireciona se não estiver autenticado
+        redirectIfNotAuthenticated();
+
+        // Carregar e exibir nome do usuário
+        displayUserName();
 
         // Botão de logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja sair?')) {
-                auth.logout();
+                logout();
             }
         });
     </script>
@@ -422,5 +410,3 @@
         }
     </script>
 </body>
-
-</html>
