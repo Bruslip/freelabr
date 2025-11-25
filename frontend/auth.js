@@ -128,7 +128,7 @@ function redirectIfAuthenticated() {
 
 // Função para exibir nome do usuário
 async function displayUserName() {
-    const userNameElement = document.getElementById('user-name');
+    const userNameElement = document.getElementById('userName');
     if (!userNameElement) return;
 
     const result = await getCurrentUser();
