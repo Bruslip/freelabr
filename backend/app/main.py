@@ -11,8 +11,8 @@ from supabase import create_client, Client
 from datetime import timedelta
 load_dotenv()
 # Inicializar Supabase
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_ANON_KEY")
+supabase_url = os.getenv("https://pidezhfmxvdrkeothyeo.supabase.co")
+supabase_key = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZGV6aGZteHZkcmtlb3RoeWVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwNzgwMTksImV4cCI6MjA3OTY1NDAxOX0.2siL8UW0XdqEJPtFulaz5pjsG-pE0RASpHfvemW0uyQ")
 supabase: Client = None
 if supabase_url and supabase_key:
 supabase = create_client(supabase_url, supabase_key)
