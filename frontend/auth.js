@@ -45,7 +45,7 @@ async function login(email, password) {
     try {
         // FormData para enviar como application/x-www-form-urlencoded
         const formData = new URLSearchParams();
-        formData.append('username', email);
+        formData.append('email', email);
         formData.append('password', password);
 
         const data = await apiRequest('/api/auth/login', {
