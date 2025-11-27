@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>FreelaBR - Calculadora para Freelancers</title>
+    <title>FreelaBR - Calculadora para Freelancers Brasileiros</title>
     <!-- PWA Meta Tags -->
     <meta name="description"
         content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
@@ -401,6 +401,174 @@
                 gap: 1rem;
             }
         }
+
+        /* Modal de Perfil */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(-20px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .user-name-clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .user-name-clickable:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 1.5rem 0;
+        }
+
+        .help-text {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 
@@ -444,7 +612,8 @@
                         <span id="themeIcon">🌙</span>
                     </div>
                     <!-- Nome do usuário - Mobile: apenas nome | Desktop: com "Olá" -->
-                    <div class="text-right">
+                    <div class="text-right user-name-clickable" id="userNameContainer"
+                        title="Clique para ver seu perfil">
                         <p class="text-sm text-purple-100 hidden md:block">Olá,</p>
                         <p class="font-semibold text-sm md:text-base" id="userName">Carregando...</p>
                     </div>
@@ -456,6 +625,56 @@
             </div>
         </div>
     </header>
+    <!-- Modal de Perfil -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-xl font-bold">👤 Meu Perfil</h3>
+                <button class="modal-close" id="closeProfileModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="profileAlert"></div>
+                <form id="profileForm">
+                    <!-- Informações Atuais -->
+                    <div class="bg-tertiary p-4 rounded-lg mb-6">
+                        <h4 class="font-semibold text-primary mb-2">📋 Informações Atuais</h4>
+                        <div class="text-sm space-y-1">
+                            <p class="text-secondary"><strong>Nome:</strong> <span id="currentName">-</span></p>
+                            <p class="text-secondary"><strong>Email:</strong> <span id="currentEmail">-</span></p>
+                        </div>
+                    </div>
+                    <!-- Formulário de Edição -->
+                    <h4 class="font-semibold text-primary mb-4">✏️ Editar Informações</h4>
+                    <div class="input-group">
+                        <label class="input-label">Nome Completo</label>
+                        <input type="text" id="newFullName" class="input-field"
+                            placeholder="Digite seu novo nome (opcional)">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Email</label>
+                        <input type="email" id="newEmail" class="input-field"
+                            placeholder="Digite seu novo email (opcional)">
+                    </div>
+                    <div class="divider"></div>
+                    <div class="input-group">
+                        <label class="input-label">Nova Senha (opcional)</label>
+                        <input type="password" id="newPassword" class="input-field"
+                            placeholder="Digite uma nova senha (opcional)">
+                        <p class="help-text">Mínimo 6 caracteres. Deixe em branco se não quiser alterar.</p>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Senha Atual <span style="color: #ef4444;">*</span></label>
+                        <input type="password" id="currentPassword" class="input-field"
+                            placeholder="Digite sua senha atual" required>
+                        <p class="help-text">Obrigatório para confirmar as alterações</p>
+                    </div>
+                    <button type="submit" class="btn-primary" id="updateProfileBtn">
+                        💾 Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -712,6 +931,7 @@
     <!-- Footer -->
     <footer class="bg-secondary py-6 mt-16">
         <div class="container mx-auto px-4 text-center">
+            <p class="text-primary">Made with ❤️ by <strong>MiniMax Agent</strong></p>
             <p class="text-tertiary text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
         </div>
     </footer>
@@ -759,6 +979,139 @@
                 logout();
             }
         });
+    </script>
+    <!-- Profile Modal Script -->
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8000'
+            : 'https://freelabr.onrender.com';
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const userNameContainer = document.getElementById('userNameContainer');
+        const profileForm = document.getElementById('profileForm');
+        const profileAlert = document.getElementById('profileAlert');
+        // Abrir modal ao clicar no nome
+        userNameContainer.addEventListener('click', async () => {
+            await loadUserProfile();
+            profileModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        // Fechar modal
+        closeProfileModal.addEventListener('click', () => {
+            closeModal();
+        });
+        // Fechar ao clicar fora
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                closeModal();
+            }
+        });
+        // Fechar com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && profileModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+        function closeModal() {
+            profileModal.classList.remove('active');
+            document.body.style.overflow = '';
+            profileForm.reset();
+            profileAlert.innerHTML = '';
+        }
+        // Carregar dados do perfil
+        async function loadUserProfile() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error('Erro ao carregar perfil');
+                const userData = await response.json();
+                document.getElementById('currentName').textContent = userData.full_name;
+                document.getElementById('currentEmail').textContent = userData.email;
+                // Preencher campos com valores atuais
+                document.getElementById('newFullName').placeholder = userData.full_name;
+                document.getElementById('newEmail').placeholder = userData.email;
+            } catch (error) {
+                console.error('Erro ao carregar perfil:', error);
+                showAlert('Erro ao carregar dados do perfil', 'error');
+            }
+        }
+        // Atualizar perfil
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updateBtn = document.getElementById('updateProfileBtn');
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newFullName = document.getElementById('newFullName').value.trim();
+            const newEmail = document.getElementById('newEmail').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            // Validações
+            if (!currentPassword) {
+                showAlert('Senha atual é obrigatória', 'error');
+                return;
+            }
+            if (!newFullName && !newEmail && !newPassword) {
+                showAlert('Forneça pelo menos uma informação para atualizar', 'error');
+                return;
+            }
+            if (newPassword && newPassword.length < 6) {
+                showAlert('Nova senha deve ter no mínimo 6 caracteres', 'error');
+                return;
+            }
+            // Preparar dados
+            const updateData = {
+                current_password: currentPassword
+            };
+            if (newFullName) updateData.full_name = newFullName;
+            if (newEmail) updateData.email = newEmail;
+            if (newPassword) updateData.new_password = newPassword;
+            // Enviar para API
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<span class="spinner"></span> Salvando...';
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Erro ao atualizar perfil');
+                }
+                // Sucesso!
+                showAlert('✅ Perfil atualizado com sucesso!', 'success');
+                // Atualizar nome na tela
+                if (result.user && result.user.full_name) {
+                    document.getElementById('userName').textContent = result.user.full_name;
+                }
+                // Limpar formulário
+                profileForm.reset();
+                // Recarregar dados
+                setTimeout(async () => {
+                    await loadUserProfile();
+                }, 1000);
+            } catch (error) {
+                console.error('Erro ao atualizar perfil:', error);
+                showAlert(error.message || 'Erro ao atualizar perfil', 'error');
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = '💾 Salvar Alterações';
+            }
+        });
+        function showAlert(message, type) {
+            const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+            profileAlert.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            // Auto-hide após 5 segundos
+            setTimeout(() => {
+                profileAlert.innerHTML = '';
+            }, 5000);
+        }
     </script>
     <!-- Enhanced Calculator Script with Animations -->
     <script>
