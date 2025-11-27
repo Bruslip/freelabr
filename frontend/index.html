@@ -26,12 +26,109 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
         }
 
+        /* Dark Mode Classes */
+        body.dark {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        body.dark .bg-gray-50 {
+            background-color: #1a202c !important;
+        }
+
+        body.dark .bg-white {
+            background-color: #2d3748 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark .bg-gray-800 {
+            background-color: #1a202c !important;
+        }
+
+        body.dark .text-gray-800 {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark .text-gray-700 {
+            color: #cbd5e0 !important;
+        }
+
+        body.dark .text-gray-600 {
+            color: #a0aec0 !important;
+        }
+
+        body.dark .text-gray-500 {
+            color: #718096 !important;
+        }
+
+        body.dark .text-gray-400 {
+            color: #a0aec0 !important;
+        }
+
+        body.dark .border-gray-300 {
+            border-color: #4a5568 !important;
+        }
+
+        body.dark .bg-gray-50 {
+            background-color: #374151 !important;
+        }
+
+        body.dark input,
+        body.dark select {
+            background-color: #374151 !important;
+            color: #e2e8f0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark input::placeholder {
+            color: #718096 !important;
+        }
+
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Hover Effects */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark .card-hover:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Input Focus Effects */
+        input:focus,
+        select:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Button Hover Effects */
+        button {
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         /* PWA Install Button */
@@ -56,6 +153,33 @@
             font-size: 14px;
             display: none;
             z-index: 999;
+        }
+
+        /* Dark Mode Toggle Button */
+        #darkModeToggle {
+            cursor: pointer;
+            font-size: 24px;
+            user-select: none;
+        }
+
+        /* Smooth Gradient Animation */
+        .gradient-bg {
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
     </style>
 </head>
@@ -96,6 +220,13 @@
                     <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers</p>
                 </div>
                 <div class="flex items-center gap-4">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" title="Alternar tema"
+                        class="text-2xl hover:scale-110 transition-transform">
+                        🌙
+                    </button>
+
+                    <!-- Nome do usuário - clicável em TODAS as telas -->
                     <div class="text-right cursor-pointer hover:opacity-80 transition" id="userNameContainer">
                         <p class="text-sm text-purple-100">Olá,</p>
                         <p class="font-semibold" id="userName">Carregando...</p>
@@ -205,7 +336,7 @@
     <main class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Form - Left Side -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Seus Dados</h2>
 
                 <form id="calculatorForm" class="space-y-6">
@@ -305,7 +436,7 @@
             <!-- Results - Right Side -->
             <div id="resultsSection" class="space-y-4 hidden">
                 <!-- Valores Principais -->
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">✅ Seus Valores</h2>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -329,7 +460,7 @@
                 </div>
 
                 <!-- Projetos Sugeridos -->
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">📦 Valores para Projetos</h3>
                     <div class="space-y-3">
                         <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -348,7 +479,7 @@
                 </div>
 
                 <!-- Breakdown de Custos -->
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Detalhamento</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
@@ -516,12 +647,11 @@
 
                 // Fechar modal após 1.5 segundos (dar tempo para ver a mensagem)
                 setTimeout(async () => {
-
-
                     // Atualizar o nome no header se foi alterado
                     if (newFullName) {
                         await displayUserName();
                     }
+
                     // Fechar modal
                     profileModal.classList.add('hidden');
                     profileModal.classList.remove('flex');
@@ -544,6 +674,7 @@
                 : 'bg-red-100 text-red-700 border-2 border-red-300'
                 }`;
             profileMessage.classList.remove('hidden');
+
             // Scroll para a mensagem ficar visível
             profileMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
