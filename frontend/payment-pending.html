@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Pendente - FreelaBR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            animation: spin 2s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-yellow-50 to-yellow-100 min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full text-center">
+        <!-- Ícone de Pendente -->
+        <div class="w-24 h-24 mx-auto mb-6 bg-yellow-100 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-yellow-600 spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">⏳ Pagamento Pendente</h1>
+
+        <p class="text-lg text-gray-600 mb-6">
+            Estamos aguardando a confirmação do seu pagamento.
+        </p>
+
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-8">
+            <p class="text-yellow-800 font-semibold mb-2">⚠️ Aguardando confirmação</p>
+            <p class="text-yellow-700 text-sm">
+                Para pagamentos via PIX ou boleto, a confirmação pode levar alguns minutos.
+            </p>
+        </div>
+
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-8">
+            <p class="text-blue-800 font-semibold mb-2">📧 Fique atento ao email</p>
+            <p class="text-blue-700 text-sm">
+                Você receberá um email assim que o pagamento for aprovado!
+            </p>
+        </div>
+
+        <div class="space-y-3">
+            <a href="/index.html"
+                class="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition">
+                ← Voltar ao início
+            </a>
+
+            <button onclick="checkPaymentStatus()"
+                class="block w-full bg-yellow-100 text-yellow-800 py-3 px-6 rounded-lg font-semibold hover:bg-yellow-200 transition">
+                🔄 Verificar Status
+            </button>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        async function checkPaymentStatus() {
+            try {
+                const token = localStorage.getItem('access_token');
+
+                if (!token) {
+                    alert('Você precisa estar logado!');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const response = await fetch('https://freelabr-backend.onrender.com/api/subscription/status', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.is_pro) {
+                        alert('🎉 Pagamento aprovado! Redirecionando...');
+                        window.location.href = '/payment-success.html';
+                    } else {
+                        alert('⏳ Ainda aguardando confirmação. Tente novamente em alguns minutos.');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+                alert('Erro ao verificar status. Tente novamente.');
+            }
+        }
+
+        // Verificar automaticamente a cada 30 segundos
+        setInterval(checkPaymentStatus, 30000);
+    </script>
+</body>
+
+</html>

@@ -229,8 +229,19 @@
                     <!-- Nome do usuário - clicável em TODAS as telas -->
                     <div class="text-right cursor-pointer hover:opacity-80 transition" id="userNameContainer">
                         <p class="text-sm text-purple-100">Olá,</p>
-                        <p class="font-semibold" id="userName">Carregando...</p>
+                        <p class="font-semibold flex items-center gap-2 justify-end">
+                            <span id="userName">Carregando...</span>
+                            <span id="proBadge"
+                                class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">💎
+                                PRO</span>
+                        </p>
                     </div>
+
+                    <!-- Botão Upgrade (aparece só para usuários FREE) -->
+                    <a href="/pricing.html" id="upgradeBtn"
+                        class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-lg">
+                        ⭐ Upgrade PRO
+                    </a>
                     <button id="logoutBtn"
                         class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
                         Sair
@@ -531,6 +542,31 @@
         // Carregar e exibir nome do usuário
         displayUserName();
 
+        // Verificar status PRO
+        async function checkProStatus() {
+            try {
+                const result = await apiRequest('/api/subscription/status');
+
+                const proBadge = document.getElementById('proBadge');
+                const upgradeBtn = document.getElementById('upgradeBtn');
+
+                if (result.is_pro) {
+                    // Usuário é PRO - mostrar badge
+                    proBadge.classList.remove('hidden');
+                    upgradeBtn.classList.add('hidden');
+                } else {
+                    // Usuário é FREE - mostrar botão upgrade
+                    proBadge.classList.add('hidden');
+                    upgradeBtn.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status PRO:', error);
+            }
+        }
+
+        // Verificar PRO ao carregar
+        checkProStatus();
+
         // Botão de logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja sair?')) {
@@ -670,8 +706,8 @@
             const icon = type === 'success' ? '✅ ' : '❌ ';
             profileMessage.textContent = icon + message;
             profileMessage.className = `text-sm p-4 rounded-lg font-semibold ${type === 'success'
-                ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                : 'bg-red-100 text-red-700 border-2 border-red-300'
+                    ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                    : 'bg-red-100 text-red-700 border-2 border-red-300'
                 }`;
             profileMessage.classList.remove('hidden');
 

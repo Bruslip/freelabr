@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status, Form
+from fastapi import FastAPI, HTTPException, Depends, status, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import CalculatorInput, CalculatorResult, UserCreate
 from app.services.calculator_service import CalculatorService
@@ -7,6 +7,9 @@ from app.dependencies import get_current_user
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
+import mercadopago
+from datetime import datetime, timedelta
+from typing import Optional
 
 load_dotenv()
 
@@ -17,6 +20,12 @@ supabase: Client = None
 
 if supabase_url and supabase_key:
     supabase = create_client(supabase_url, supabase_key)
+
+# Inicializar Mercado Pago
+mp_access_token = os.getenv("MERCADOPAGO_ACCESS_TOKEN")
+mp = None
+if mp_access_token:
+    mp = mercadopago.SDK(mp_access_token)
 
 # Inicializar FastAPI
 app = FastAPI(
@@ -215,7 +224,6 @@ async def get_me(current_user: dict = Depends(get_current_user)):
             detail=f"Erro ao buscar usuário: {str(e)}"
         )
 
-# ✅ NOVO ENDPOINT ADICIONADO
 @app.put("/api/auth/update-profile")
 async def update_profile(
     update_data: dict,
@@ -457,6 +465,266 @@ async def get_examples():
         }
     
     return examples
+
+# ==================== PRO SUBSCRIPTION ROUTES ====================
+
+@app.get("/api/subscription/status")
+async def get_subscription_status(current_user: dict = Depends(get_current_user)):
+    """
+    Retorna status da assinatura PRO do usuário
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    try:
+        # Buscar informações do usuário
+        user_result = supabase.table("users").select(
+            "is_pro, subscription_status, subscription_plan, subscription_end_date"
+        ).eq("id", current_user["id"]).execute()
+        
+        if not user_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado"
+            )
+        
+        user_data = user_result.data[0]
+        
+        # Verificar se assinatura expirou
+        is_expired = False
+        if user_data.get("subscription_end_date"):
+            end_date = datetime.fromisoformat(user_data["subscription_end_date"].replace("Z", "+00:00"))
+            is_expired = end_date < datetime.now()
+            
+            if is_expired and user_data.get("is_pro"):
+                # Atualizar status se expirou
+                supabase.table("users").update({
+                    "is_pro": False,
+                    "subscription_status": "expired"
+                }).eq("id", current_user["id"]).execute()
+                user_data["is_pro"] = False
+                user_data["subscription_status"] = "expired"
+        
+        return {
+            "is_pro": user_data.get("is_pro", False),
+            "status": user_data.get("subscription_status", "free"),
+            "plan": user_data.get("subscription_plan"),
+            "end_date": user_data.get("subscription_end_date"),
+            "is_expired": is_expired
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao verificar status: {str(e)}"
+        )
+
+@app.post("/api/subscription/create-preference")
+async def create_payment_preference(
+    plan_type: str,  # 'monthly' ou 'annual'
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Cria preferência de pagamento no Mercado Pago
+    """
+    if not mp:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Mercado Pago não configurado"
+        )
+    
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    # Validar tipo de plano
+    if plan_type not in ["monthly", "annual"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tipo de plano inválido. Use 'monthly' ou 'annual'"
+        )
+    
+    # Definir preços
+    prices = {
+        "monthly": 29.90,
+        "annual": 299.00
+    }
+    
+    price = prices[plan_type]
+    plan_name = "Mensal" if plan_type == "monthly" else "Anual"
+    
+    try:
+        # Buscar dados do usuário
+        user_result = supabase.table("users").select("email, full_name").eq("id", current_user["id"]).execute()
+        
+        if not user_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado"
+            )
+        
+        user_data = user_result.data[0]
+        
+        # Criar preferência de pagamento
+        preference_data = {
+            "items": [
+                {
+                    "title": f"FreelaBR PRO - Plano {plan_name}",
+                    "quantity": 1,
+                    "unit_price": price,
+                    "currency_id": "BRL"
+                }
+            ],
+            "payer": {
+                "email": user_data["email"],
+                "name": user_data["full_name"]
+            },
+            "back_urls": {
+                "success": f"{os.getenv('FRONTEND_URL')}/payment-success",
+                "failure": f"{os.getenv('FRONTEND_URL')}/payment-failure",
+                "pending": f"{os.getenv('FRONTEND_URL')}/payment-pending"
+            },
+            "auto_return": "approved",
+            "external_reference": f"{current_user['id']}|{plan_type}",
+            "notification_url": f"{os.getenv('BACKEND_URL', 'https://freelabr-backend.onrender.com')}/api/subscription/webhook",
+            "statement_descriptor": "FREELABR PRO",
+            "metadata": {
+                "user_id": current_user["id"],
+                "plan_type": plan_type
+            }
+        }
+        
+        # Criar preferência no Mercado Pago
+        preference_response = mp.preference().create(preference_data)
+        preference = preference_response["response"]
+        
+        return {
+            "preference_id": preference["id"],
+            "init_point": preference["init_point"],
+            "sandbox_init_point": preference.get("sandbox_init_point")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao criar preferência: {str(e)}"
+        )
+
+@app.post("/api/subscription/webhook")
+async def mercadopago_webhook(request: Request):
+    """
+    Recebe notificações de pagamento do Mercado Pago
+    """
+    if not mp or not supabase:
+        return {"status": "service_unavailable"}
+    
+    try:
+        # Pegar dados do webhook
+        data = await request.json()
+        
+        # Mercado Pago envia o tipo da notificação
+        if data.get("type") == "payment":
+            payment_id = data["data"]["id"]
+            
+            # Buscar informações do pagamento
+            payment_info = mp.payment().get(payment_id)
+            payment = payment_info["response"]
+            
+            # Verificar se pagamento foi aprovado
+            if payment["status"] == "approved":
+                # Extrair user_id e plan_type do external_reference
+                external_ref = payment.get("external_reference", "")
+                if "|" in external_ref:
+                    user_id, plan_type = external_ref.split("|")
+                    
+                    # Calcular data de expiração
+                    start_date = datetime.now()
+                    if plan_type == "monthly":
+                        end_date = start_date + timedelta(days=30)
+                    else:  # annual
+                        end_date = start_date + timedelta(days=365)
+                    
+                    # Atualizar usuário para PRO
+                    supabase.table("users").update({
+                        "is_pro": True,
+                        "subscription_status": "active",
+                        "subscription_plan": plan_type,
+                        "subscription_start_date": start_date.isoformat(),
+                        "subscription_end_date": end_date.isoformat(),
+                        "mercadopago_customer_id": payment.get("payer", {}).get("id")
+                    }).eq("id", user_id).execute()
+                    
+                    # Criar registro de assinatura
+                    subscription_data = {
+                        "user_id": user_id,
+                        "plan_type": plan_type,
+                        "plan_price": payment["transaction_amount"],
+                        "status": "active",
+                        "start_date": start_date.isoformat(),
+                        "end_date": end_date.isoformat(),
+                        "mercadopago_payment_id": str(payment_id)
+                    }
+                    supabase.table("subscriptions").insert(subscription_data).execute()
+                    
+                    # Criar registro de pagamento
+                    payment_data = {
+                        "user_id": user_id,
+                        "subscription_id": None,  # Será preenchido depois
+                        "amount": payment["transaction_amount"],
+                        "status": "approved",
+                        "payment_method": payment.get("payment_method_id"),
+                        "mercadopago_payment_id": str(payment_id),
+                        "mercadopago_status": payment["status"],
+                        "mercadopago_status_detail": payment.get("status_detail"),
+                        "paid_at": datetime.now().isoformat()
+                    }
+                    supabase.table("payments").insert(payment_data).execute()
+        
+        return {"status": "ok"}
+        
+    except Exception as e:
+        print(f"Erro no webhook: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@app.post("/api/subscription/cancel")
+async def cancel_subscription(current_user: dict = Depends(get_current_user)):
+    """
+    Cancela assinatura PRO do usuário
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    try:
+        # Atualizar status da assinatura
+        supabase.table("users").update({
+            "subscription_status": "canceled"
+        }).eq("id", current_user["id"]).execute()
+        
+        # Atualizar assinatura ativa
+        supabase.table("subscriptions").update({
+            "status": "canceled",
+            "canceled_at": datetime.now().isoformat()
+        }).eq("user_id", current_user["id"]).eq("status", "active").execute()
+        
+        return {"message": "Assinatura cancelada com sucesso"}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao cancelar assinatura: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn

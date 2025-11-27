@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelaBR PRO - Planos e Preços</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .pricing-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .pro-badge {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .check-icon {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .cross-icon {
+            color: #ef4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">🚀 FreelaBR</h1>
+                    <p class="text-purple-100 mt-1">Escolha o melhor plano para você</p>
+                </div>
+                <a href="/index.html"
+                    class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
+                    ← Voltar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12 max-w-6xl">
+        <!-- Título -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Planos e Preços</h2>
+            <p class="text-xl text-gray-600">Escolha o plano ideal para impulsionar sua carreira freelancer</p>
+        </div>
+
+        <!-- Cartões de Preços -->
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <!-- FREE -->
+            <div class="pricing-card bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">FREE</h3>
+                    <div class="text-5xl font-bold text-gray-800 mb-2">
+                        R$ 0
+                    </div>
+                    <p class="text-gray-500">Para sempre</p>
+                </div>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">Calculadora básica ilimitada</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">Ver resultados na tela</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">Comparar regimes tributários</span>
+                    </li>
+                    <li class="flex items-start opacity-50">
+                        <span class="cross-icon mr-3">✗</span>
+                        <span class="text-gray-500">Salvar histórico</span>
+                    </li>
+                    <li class="flex items-start opacity-50">
+                        <span class="cross-icon mr-3">✗</span>
+                        <span class="text-gray-500">Exportar PDF</span>
+                    </li>
+                    <li class="flex items-start opacity-50">
+                        <span class="cross-icon mr-3">✗</span>
+                        <span class="text-gray-500">Templates de projetos</span>
+                    </li>
+                    <li class="flex items-start opacity-50">
+                        <span class="cross-icon mr-3">✗</span>
+                        <span class="text-gray-500">Analytics e gráficos</span>
+                    </li>
+                </ul>
+
+                <button disabled
+                    class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-semibold cursor-not-allowed">
+                    Plano Atual
+                </button>
+            </div>
+
+            <!-- PRO MENSAL - DESTAQUE -->
+            <div
+                class="pricing-card bg-white rounded-2xl shadow-2xl p-8 border-4 border-purple-500 relative transform md:scale-105">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span class="pro-badge text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                        🔥 MAIS POPULAR
+                    </span>
+                </div>
+
+                <div class="text-center mb-6 mt-4">
+                    <h3 class="text-2xl font-bold text-purple-600 mb-2">PRO MENSAL</h3>
+                    <div class="text-5xl font-bold text-gray-800 mb-2">
+                        R$ 29<span class="text-2xl">,90</span>
+                    </div>
+                    <p class="text-gray-500">por mês</p>
+                </div>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700 font-semibold">Tudo do FREE +</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">💾 Salvar histórico ilimitado</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📄 Exportar PDF profissional</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">⚖️ Comparador avançado</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📋 Templates de projetos</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📊 Dashboard com gráficos</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">💎 Badge PRO exclusivo</span>
+                    </li>
+                </ul>
+
+                <button onclick="upgradeToPro('monthly')"
+                    class="w-full gradient-bg text-white py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg">
+                    🚀 Assinar Mensal
+                </button>
+            </div>
+
+            <!-- PRO ANUAL -->
+            <div class="pricing-card bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200">
+                <div class="text-center mb-6">
+                    <div class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold mb-3">
+                        💰 ECONOMIZE 17%
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">PRO ANUAL</h3>
+                    <div class="text-5xl font-bold text-gray-800 mb-2">
+                        R$ 299
+                    </div>
+                    <p class="text-gray-500">por ano</p>
+                    <p class="text-sm text-green-600 font-semibold mt-2">~R$ 24,92/mês</p>
+                </div>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700 font-semibold">Tudo do FREE +</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">💾 Salvar histórico ilimitado</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📄 Exportar PDF profissional</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">⚖️ Comparador avançado</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📋 Templates de projetos</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">📊 Dashboard com gráficos</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="check-icon mr-3">✓</span>
+                        <span class="text-gray-700">💎 Badge PRO exclusivo</span>
+                    </li>
+                </ul>
+
+                <button onclick="upgradeToPro('annual')"
+                    class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg">
+                    💚 Assinar Anual
+                </button>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">❓ Perguntas Frequentes</h3>
+
+            <div class="space-y-4">
+                <div class="border-b pb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Posso cancelar a qualquer momento?</h4>
+                    <p class="text-gray-600">Sim! Você pode cancelar sua assinatura a qualquer momento e continuar
+                        usando até o fim do período pago.</p>
+                </div>
+
+                <div class="border-b pb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Quais formas de pagamento são aceitas?</h4>
+                    <p class="text-gray-600">Aceitamos PIX, cartão de crédito, débito e boleto através do Mercado Pago.
+                    </p>
+                </div>
+
+                <div class="border-b pb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Meus dados salvos ficam seguros?</h4>
+                    <p class="text-gray-600">Sim! Utilizamos criptografia e armazenamento seguro no Supabase. Seus dados
+                        nunca são compartilhados.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">Posso trocar de plano depois?</h4>
+                    <p class="text-gray-600">Sim! Você pode fazer upgrade do mensal para anual a qualquer momento.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">© 2025 FreelaBR - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script>
+        // Verificar autenticação
+        redirectIfNotAuthenticated();
+
+        // Função para fazer upgrade
+        async function upgradeToPro(planType) {
+            try {
+                const token = localStorage.getItem('access_token');
+
+                if (!token) {
+                    alert('Você precisa estar logado para assinar!');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Criar preferência de pagamento
+                const response = await fetch('https://freelabr-backend.onrender.com/api/subscription/create-preference?plan_type=' + planType, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao criar preferência de pagamento');
+                }
+
+                const data = await response.json();
+
+                // Redirecionar para checkout do Mercado Pago
+                window.location.href = data.init_point;
+
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar pagamento. Tente novamente.');
+            }
+        }
+
+        // Verificar se usuário já é PRO
+        async function checkProStatus() {
+            try {
+                const token = localStorage.getItem('access_token');
+
+                if (!token) return;
+
+                const response = await fetch('https://freelabr-backend.onrender.com/api/subscription/status', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.is_pro) {
+                        // Usuário já é PRO, redirecionar
+                        alert('Você já é um assinante PRO! 🎉');
+                        window.location.href = '/index.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+            }
+        }
+
+        // Verificar ao carregar a página
+        checkProStatus();
+    </script>
+</body>
+
+</html>

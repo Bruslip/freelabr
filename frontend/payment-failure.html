@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Não Aprovado - FreelaBR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-red-50 to-red-100 min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full text-center">
+        <!-- Ícone de Erro -->
+        <div class="w-24 h-24 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">😕 Pagamento Não Aprovado</h1>
+
+        <p class="text-lg text-gray-600 mb-6">
+            Não foi possível processar seu pagamento.
+        </p>
+
+        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-8">
+            <p class="text-red-800 font-semibold mb-2">❌ Erro no processamento</p>
+            <p class="text-red-700 text-sm">
+                Possíveis motivos: dados incorretos, saldo insuficiente, cartão recusado
+            </p>
+        </div>
+
+        <div class="space-y-3">
+            <a href="/pricing.html"
+                class="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition">
+                🔄 Tentar Novamente
+            </a>
+
+            <a href="/index.html"
+                class="block w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition">
+                ← Voltar ao início
+            </a>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-6">
+            Precisa de ajuda? Entre em contato conosco.
+        </p>
+    </div>
+</body>
+
+</html>

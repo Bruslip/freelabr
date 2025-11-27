@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado - FreelaBR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes checkmark {
+            0% {
+                stroke-dashoffset: 166;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .checkmark {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            animation: checkmark 0.6s ease-in-out 0.3s forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 to-green-100 min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full text-center">
+        <!-- Ícone de Sucesso Animado -->
+        <svg class="mx-auto mb-6" width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#10b981" opacity="0.2" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" stroke-width="3" />
+            <path class="checkmark" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round"
+                stroke-linejoin="round" d="M30 50 L45 65 L70 35" />
+        </svg>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">🎉 Pagamento Aprovado!</h1>
+
+        <p class="text-lg text-gray-600 mb-6">
+            Bem-vindo ao <span class="font-bold text-green-600">FreelaBR PRO</span>!
+        </p>
+
+        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-8">
+            <p class="text-green-800 font-semibold mb-2">✅ Assinatura ativada com sucesso</p>
+            <p class="text-green-700 text-sm">Você já tem acesso a todos os recursos PRO!</p>
+        </div>
+
+        <div class="space-y-3">
+            <a href="/index.html"
+                class="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition">
+                🚀 Começar a usar
+            </a>
+
+            <a href="/index.html"
+                class="block w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition">
+                ← Voltar ao início
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Redirecionar automaticamente após 5 segundos
+        setTimeout(() => {
+            window.location.href = '/index.html';
+        }, 5000);
+    </script>
+</body>
+
+</html>
