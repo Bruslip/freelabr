@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreelaBR - Calculadora para Freelancers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FreelaBR - Calculadora para Freelancers </title>
 
     <!-- PWA Meta Tags -->
     <meta name="description"
         content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#667eea" id="theme-color-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FreelaBR">
@@ -26,12 +26,91 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+        /* CSS Variables para Dark Mode */
+        :root {
+            --bg-primary: #f9fafb;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border-color: #d1d5db;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --loading-overlay-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        html.dark {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-tertiary: #9ca3af;
+            --border-color: #4b5563;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
+            --loading-overlay-bg: rgba(31, 41, 55, 0.95);
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bg-card {
+            background-color: var(--bg-secondary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .border-custom {
+            border-color: var(--border-color);
+        }
+
+        .text-primary {
+            color: var(--text-primary);
+        }
+
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .text-tertiary {
+            color: var(--text-tertiary);
+        }
+
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
         }
 
         /* PWA Install Button */
@@ -105,6 +184,11 @@
             pointer-events: none;
         }
 
+        html.dark .tooltip-content {
+            background: #374151;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
         .tooltip-content::after {
             content: "";
             position: absolute;
@@ -115,10 +199,40 @@
             border-color: #1f2937 transparent transparent transparent;
         }
 
+        html.dark .tooltip-content::after {
+            border-color: #374151 transparent transparent transparent;
+        }
+
         .tooltip-container:hover .tooltip-content {
             visibility: visible;
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Mobile Touch Targets - Mínimo 44px */
+        @media (max-width: 768px) {
+            .tooltip-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+            }
+
+            button {
+                min-height: 48px;
+                font-size: 16px;
+            }
+
+            input,
+            select {
+                min-height: 48px;
+                font-size: 16px;
+            }
+
+            .theme-toggle {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
         }
 
         /* Loading Spinner */
@@ -206,18 +320,24 @@
 
         .hover-lift:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-lg);
         }
 
         /* Smooth transitions for inputs */
         input,
         select {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
             transition: all 0.2s ease;
         }
 
         input:focus,
         select:focus {
             transform: translateY(-1px);
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         /* Loading overlay */
@@ -227,7 +347,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--loading-overlay-bg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -243,29 +363,49 @@
             height: 40px;
             animation: spin 1s linear infinite;
         }
+
+        /* Mobile Improvements */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .grid {
+                gap: 1rem;
+            }
+        }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body>
     <!-- Offline Indicator -->
     <div id="offlineIndicator">
         📶 Você está offline. O app continuará funcionando!
     </div>
 
     <!-- Install Prompt -->
-    <div id="installPrompt" class="bg-white rounded-lg shadow-2xl p-4 max-w-sm">
+    <div id="installPrompt" class="bg-card rounded-lg shadow-2xl p-4 max-w-sm">
         <div class="flex items-start gap-3">
             <div class="text-4xl">📱</div>
             <div class="flex-1">
-                <h3 class="font-bold text-gray-800 mb-1">Instalar FreelaBR</h3>
-                <p class="text-sm text-gray-600 mb-3">Adicione à tela inicial para acesso rápido!</p>
+                <h3 class="font-bold text-primary mb-1">Instalar FreelaBR</h3>
+                <p class="text-sm text-secondary mb-3">Adicione à tela inicial para acesso rápido!</p>
                 <div class="flex gap-2">
                     <button id="installButton"
                         class="gradient-bg text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
                         Instalar
                     </button>
                     <button id="dismissButton"
-                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300">
+                        class="bg-tertiary text-primary px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80">
                         Agora não
                     </button>
                 </div>
@@ -279,15 +419,21 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold">🚀 FreelaBR</h1>
-                    <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers Brasileiros</p>
+                    <p class="text-purple-100 mt-1 text-sm md:text-base">Calculadora Completa para Freelancers
+                        Brasileiros</p>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 md:gap-4">
+                    <!-- Dark Mode Toggle -->
+                    <div class="theme-toggle" id="themeToggle" title="Alternar tema">
+                        <span id="themeIcon">🌙</span>
+                    </div>
+
                     <div class="text-right hidden md:block">
                         <p class="text-sm text-purple-100">Olá,</p>
                         <p class="font-semibold" id="userName">Carregando...</p>
                     </div>
                     <button id="logoutBtn"
-                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 md:px-4 py-2 rounded-lg font-semibold transition text-sm md:text-base">
                         Sair
                     </button>
                 </div>
@@ -297,15 +443,15 @@
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <div class="grid md:grid-cols-2 gap-8">
+        <div class="grid md:grid-cols-2 gap-6 md:gap-8">
             <!-- Form - Left Side -->
-            <div class="bg-white rounded-lg shadow-md p-6 hover-lift relative">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Seus Dados</h2>
+            <div class="bg-card rounded-lg p-4 md:p-6 hover-lift relative">
+                <h2 class="text-2xl font-bold text-primary mb-6">📝 Seus Dados</h2>
 
-                <form id="calculatorForm" class="space-y-6">
+                <form id="calculatorForm" class="space-y-4 md:space-y-6">
                     <!-- Pró-labore -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-secondary mb-2">
                             💰 Quanto você quer ganhar por mês? (Pró-labore)
                             <div class="tooltip-container">
                                 <span class="tooltip-icon">?</span>
@@ -317,13 +463,13 @@
                             </div>
                         </label>
                         <input type="number" id="monthlyIncome" value="5000" min="1000" step="100"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                     </div>
 
                     <!-- Horas/Dias -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-secondary mb-2">
                                 ⏰ Horas por dia
                                 <div class="tooltip-container">
                                     <span class="tooltip-icon">?</span>
@@ -334,10 +480,10 @@
                                 </div>
                             </label>
                             <input type="number" id="hoursPerDay" value="8" min="1" max="16"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-secondary mb-2">
                                 📅 Dias por semana
                                 <div class="tooltip-container">
                                     <span class="tooltip-icon">?</span>
@@ -348,13 +494,13 @@
                                 </div>
                             </label>
                             <input type="number" id="daysPerWeek" value="5" min="1" max="7"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                         </div>
                     </div>
 
                     <!-- Regime Tributário -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-secondary mb-2">
                             🏛️ Regime Tributário
                             <div class="tooltip-container">
                                 <span class="tooltip-icon">?</span>
@@ -367,19 +513,19 @@
                             </div>
                         </label>
                         <select id="taxRegime"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                             <option value="MEI">MEI - Microempreendedor Individual</option>
                             <option value="PJ_SIMPLES">PJ - Simples Nacional</option>
                             <option value="PJ_PRESUMIDO">PJ - Lucro Presumido</option>
                             <option value="AUTONOMO">Autônomo (Pessoa Física)</option>
                         </select>
-                        <p id="regimeInfo" class="text-xs text-gray-500 mt-1"></p>
+                        <p id="regimeInfo" class="text-xs text-tertiary mt-1"></p>
                     </div>
 
                     <!-- Despesas -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-secondary mb-2">
                                 💸 Despesas Fixas/mês
                                 <div class="tooltip-container">
                                     <span class="tooltip-icon">?</span>
@@ -390,11 +536,11 @@
                                 </div>
                             </label>
                             <input type="number" id="monthlyExpenses" value="500" min="0" step="50"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-gray-500 mt-1">Internet, software, etc.</p>
+                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-tertiary mt-1">Internet, software, etc.</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-secondary mb-2">
                                 💳 Despesas Variáveis/mês
                                 <div class="tooltip-container">
                                     <span class="tooltip-icon">?</span>
@@ -404,8 +550,8 @@
                                 </div>
                             </label>
                             <input type="number" id="variableExpenses" value="200" min="0" step="50"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-gray-500 mt-1">Transporte, materiais, etc.</p>
+                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-tertiary mt-1">Transporte, materiais, etc.</p>
                         </div>
                     </div>
 
@@ -414,7 +560,7 @@
                         <label class="flex items-center">
                             <input type="checkbox" id="include13th" checked
                                 class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                            <span class="ml-2 text-sm text-gray-700">Incluir 13º salário</span>
+                            <span class="ml-2 text-sm text-secondary">Incluir 13º salário</span>
                             <div class="tooltip-container ml-1">
                                 <span class="tooltip-icon">?</span>
                                 <div class="tooltip-content">
@@ -426,7 +572,7 @@
                         <label class="flex items-center">
                             <input type="checkbox" id="includeVacation" checked
                                 class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                            <span class="ml-2 text-sm text-gray-700">Incluir férias + 1/3</span>
+                            <span class="ml-2 text-sm text-secondary">Incluir férias + 1/3</span>
                             <div class="tooltip-container ml-1">
                                 <span class="tooltip-icon">?</span>
                                 <div class="tooltip-content">
@@ -439,7 +585,7 @@
 
                     <!-- Margem de Lucro -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-secondary mb-2">
                             📈 Margem de Lucro: <span id="profitMarginValue">20</span>%
                             <div class="tooltip-container">
                                 <span class="tooltip-icon">?</span>
@@ -450,8 +596,8 @@
                             </div>
                         </label>
                         <input type="range" id="profitMargin" min="0" max="50" value="20"
-                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        <p class="text-xs text-gray-500 mt-1">Recomendado: 15-30%</p>
+                            class="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-tertiary mt-1">Recomendado: 15-30%</p>
                     </div>
 
                     <button type="submit"
@@ -472,73 +618,86 @@
             <!-- Results - Right Side -->
             <div id="resultsSection" class="space-y-4" style="display: none;">
                 <!-- Valores Principais -->
-                <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">✅ Seus Valores</h2>
+                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
+                    <h2 class="text-2xl font-bold text-primary mb-4">✅ Seus Valores</h2>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg hover-lift">
-                            <p class="text-sm text-purple-600 font-medium">POR HORA</p>
-                            <p class="text-3xl font-bold text-purple-900 counter" id="hourlyRate">R$ 0,00</p>
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        <div
+                            class="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 p-3 md:p-4 rounded-lg hover-lift">
+                            <p class="text-xs md:text-sm text-purple-600 dark:text-purple-300 font-medium">POR HORA</p>
+                            <p class="text-xl md:text-3xl font-bold text-purple-900 dark:text-purple-100 counter"
+                                id="hourlyRate">R$ 0,00</p>
                         </div>
-                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg hover-lift">
-                            <p class="text-sm text-blue-600 font-medium">POR DIA</p>
-                            <p class="text-3xl font-bold text-blue-900 counter" id="dailyRate">R$ 0,00</p>
+                        <div
+                            class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 p-3 md:p-4 rounded-lg hover-lift">
+                            <p class="text-xs md:text-sm text-blue-600 dark:text-blue-300 font-medium">POR DIA</p>
+                            <p class="text-xl md:text-3xl font-bold text-blue-900 dark:text-blue-100 counter"
+                                id="dailyRate">R$ 0,00</p>
                         </div>
-                        <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg hover-lift">
-                            <p class="text-sm text-green-600 font-medium">POR SEMANA</p>
-                            <p class="text-3xl font-bold text-green-900 counter" id="weeklyRate">R$ 0,00</p>
+                        <div
+                            class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 p-3 md:p-4 rounded-lg hover-lift">
+                            <p class="text-xs md:text-sm text-green-600 dark:text-green-300 font-medium">POR SEMANA</p>
+                            <p class="text-xl md:text-3xl font-bold text-green-900 dark:text-green-100 counter"
+                                id="weeklyRate">R$ 0,00</p>
                         </div>
-                        <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg hover-lift">
-                            <p class="text-sm text-orange-600 font-medium">POR MÊS</p>
-                            <p class="text-3xl font-bold text-orange-900 counter" id="monthlyRate">R$ 0,00</p>
+                        <div
+                            class="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 p-3 md:p-4 rounded-lg hover-lift">
+                            <p class="text-xs md:text-sm text-orange-600 dark:text-orange-300 font-medium">POR MÊS</p>
+                            <p class="text-xl md:text-3xl font-bold text-orange-900 dark:text-orange-100 counter"
+                                id="monthlyRate">R$ 0,00</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Projetos Sugeridos -->
-                <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">📦 Valores para Projetos</h3>
+                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
+                    <h3 class="text-xl font-bold text-primary mb-4">📦 Valores para Projetos</h3>
                     <div class="space-y-3">
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover-lift">
-                            <span class="text-gray-700">Projeto Pequeno (30h)</span>
-                            <span class="font-bold text-gray-900 counter" id="smallProject">R$ 0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
+                            <span class="text-secondary text-sm md:text-base">Projeto Pequeno (30h)</span>
+                            <span class="font-bold text-primary counter text-sm md:text-base" id="smallProject">R$
+                                0,00</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover-lift">
-                            <span class="text-gray-700">Projeto Médio (100h)</span>
-                            <span class="font-bold text-gray-900 counter" id="mediumProject">R$ 0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
+                            <span class="text-secondary text-sm md:text-base">Projeto Médio (100h)</span>
+                            <span class="font-bold text-primary counter text-sm md:text-base" id="mediumProject">R$
+                                0,00</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover-lift">
-                            <span class="text-gray-700">Projeto Grande (200h)</span>
-                            <span class="font-bold text-gray-900 counter" id="largeProject">R$ 0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
+                            <span class="text-secondary text-sm md:text-base">Projeto Grande (200h)</span>
+                            <span class="font-bold text-primary counter text-sm md:text-base" id="largeProject">R$
+                                0,00</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Breakdown de Custos -->
-                <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Detalhamento</h3>
+                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
+                    <h3 class="text-xl font-bold text-primary mb-4">📊 Detalhamento</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Pró-labore desejado:</span>
-                            <span class="font-semibold counter" id="netIncome">R$ 0,00</span>
+                            <span class="text-secondary">Pró-labore desejado:</span>
+                            <span class="font-semibold counter text-primary" id="netIncome">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Impostos mensais:</span>
-                            <span class="font-semibold text-red-600 counter" id="monthlyTaxes">R$ 0,00</span>
+                            <span class="text-secondary">Impostos mensais:</span>
+                            <span class="font-semibold text-red-600 dark:text-red-400 counter" id="monthlyTaxes">R$
+                                0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Provisões (13º + férias):</span>
-                            <span class="font-semibold counter" id="provisions">R$ 0,00</span>
+                            <span class="text-secondary">Provisões (13º + férias):</span>
+                            <span class="font-semibold counter text-primary" id="provisions">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Despesas totais:</span>
-                            <span class="font-semibold counter" id="totalExpenses">R$ 0,00</span>
+                            <span class="text-secondary">Despesas totais:</span>
+                            <span class="font-semibold counter text-primary" id="totalExpenses">R$ 0,00</span>
                         </div>
-                        <div class="border-t pt-2 flex justify-between">
-                            <span class="text-gray-800 font-bold">Custo Total/Mês:</span>
-                            <span class="font-bold text-purple-600 counter" id="totalMonthlyCost">R$ 0,00</span>
+                        <div class="border-t border-custom pt-2 flex justify-between">
+                            <span class="text-primary font-bold">Custo Total/Mês:</span>
+                            <span class="font-bold text-purple-600 dark:text-purple-400 counter"
+                                id="totalMonthlyCost">R$ 0,00</span>
                         </div>
-                        <div class="flex justify-between text-xs text-gray-500">
+                        <div class="flex justify-between text-xs text-tertiary">
                             <span>Horas trabalhadas/mês:</span>
                             <span id="workingHours">0h</span>
                         </div>
@@ -549,24 +708,58 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6 mt-16">
+    <footer class="bg-secondary py-6 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-gray-400 text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
+            <p class="text-tertiary text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
         </div>
     </footer>
 
     <script src="auth.js"></script>
     <script src="app.js"></script>
 
-    <!-- Auth Check - CORRIGIDO -->
+    <!-- Dark Mode Script -->
     <script>
-        // Proteger a rota - redireciona se não estiver autenticado
-        redirectIfNotAuthenticated();
+        // Detectar preferência do sistema
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        // Carregar e exibir nome do usuário
+        // Carregar preferência salva ou usar preferência do sistema
+        const savedTheme = localStorage.getItem('theme');
+        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+        // Aplicar tema inicial
+        if (initialTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeIcon').textContent = '☀️';
+            document.getElementById('theme-color-meta').setAttribute('content', '#1f2937');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('themeIcon').textContent = '🌙';
+            document.getElementById('theme-color-meta').setAttribute('content', '#667eea');
+        }
+
+        // Toggle do tema
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.getElementById('theme-color-meta').setAttribute('content', '#667eea');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeIcon').textContent = '☀️';
+                document.getElementById('theme-color-meta').setAttribute('content', '#1f2937');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+
+    <!-- Auth Check -->
+    <script>
+        redirectIfNotAuthenticated();
         displayUserName();
 
-        // Botão de logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja sair?')) {
                 logout();
@@ -579,7 +772,7 @@
         // Função para animar contadores
         function animateCounter(element, start, end, duration) {
             const range = end - start;
-            const increment = range / (duration / 16); // 60fps
+            const increment = range / (duration / 16);
             let current = start;
 
             const timer = setInterval(() => {
@@ -589,7 +782,6 @@
                     clearInterval(timer);
                 }
 
-                // Formatar como moeda brasileira
                 element.textContent = current.toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
@@ -597,7 +789,6 @@
             }, 16);
         }
 
-        // Adicionar efeito de pulse aos cards de resultado
         function pulseResultCards() {
             const cards = document.querySelectorAll('#resultsSection > div');
             cards.forEach((card, index) => {
@@ -608,13 +799,11 @@
             });
         }
 
-        // Override do form submit para adicionar animações
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('calculatorForm');
             const resultsSection = document.getElementById('resultsSection');
             const loadingOverlay = document.getElementById('loadingOverlay');
 
-            // Update profit margin display
             document.getElementById('profitMargin').addEventListener('input', (e) => {
                 document.getElementById('profitMarginValue').textContent = e.target.value;
             });
@@ -622,14 +811,11 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Mostrar loading
                 loadingOverlay.style.display = 'flex';
                 resultsSection.style.display = 'none';
 
-                // Simular delay para melhor UX (opcional)
                 await new Promise(resolve => setTimeout(resolve, 800));
 
-                // Coletar dados do formulário
                 const formData = {
                     desiredMonthlyIncome: parseFloat(document.getElementById('monthlyIncome').value),
                     hoursPerDay: parseInt(document.getElementById('hoursPerDay').value),
@@ -643,18 +829,13 @@
                     vacationWeeks: 4
                 };
 
-                // Calcular usando a classe FreelaBRCalculator
                 const calculator = new FreelaBRCalculator();
                 const results = calculator.calculate(formData);
 
-                // Esconder loading
                 loadingOverlay.style.display = 'none';
-
-                // Mostrar resultados com fade-in
                 resultsSection.style.display = 'block';
                 resultsSection.classList.add('fade-in');
 
-                // Animar contadores
                 animateCounter(document.getElementById('hourlyRate'), 0, results.hourlyRate, 1000);
                 animateCounter(document.getElementById('dailyRate'), 0, results.dailyRate, 1000);
                 animateCounter(document.getElementById('weeklyRate'), 0, results.weeklyRate, 1000);
@@ -672,12 +853,12 @@
 
                 document.getElementById('workingHours').textContent = Math.round(results.breakdown.workingHours) + 'h';
 
-                // Adicionar pulse effect nos cards
                 setTimeout(() => pulseResultCards(), 500);
 
-                // Scroll suave para resultados (mobile)
                 if (window.innerWidth < 768) {
-                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => {
+                        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
                 }
             });
         });
@@ -685,19 +866,16 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-        // Registrar Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('✅ Service Worker registrado:', registration.scope);
 
-                        // Verificar atualizações
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // Nova versão disponível
                                     if (confirm('Nova versão disponível! Atualizar agora?')) {
                                         window.location.reload();
                                     }
@@ -711,7 +889,6 @@
             });
         }
 
-        // PWA Install Prompt
         let deferredPrompt;
         const installPrompt = document.getElementById('installPrompt');
         const installButton = document.getElementById('installButton');
@@ -745,7 +922,6 @@
             installPrompt.style.display = 'none';
         });
 
-        // Detectar se está rodando como PWA
         window.addEventListener('load', () => {
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
                 console.log('🚀 Rodando como PWA instalado!');
@@ -753,7 +929,6 @@
             }
         });
 
-        // Detectar status online/offline
         const offlineIndicator = document.getElementById('offlineIndicator');
 
         window.addEventListener('online', () => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freelabr-v1.6.0';
+const CACHE_NAME = 'freelabr-v1.7.0';
 const urlsToCache = [
   '/',
   '/index.html',
