@@ -215,6 +215,7 @@ async def get_me(current_user: dict = Depends(get_current_user)):
             detail=f"Erro ao buscar usuário: {str(e)}"
         )
 
+# ✅ NOVO ENDPOINT ADICIONADO
 @app.put("/api/auth/update-profile")
 async def update_profile(
     update_data: dict,
@@ -222,6 +223,7 @@ async def update_profile(
 ):
     """
     Atualiza informações do perfil do usuário logado
+    Requer senha atual para qualquer alteração
     Permite atualizar: full_name, email, password
     """
     if not supabase:
@@ -231,6 +233,31 @@ async def update_profile(
         )
     
     try:
+        # VALIDAR SENHA ATUAL (obrigatória)
+        if "current_password" not in update_data or not update_data["current_password"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Senha atual é obrigatória para fazer alterações"
+            )
+        
+        # Buscar usuário com senha hash
+        user_result = supabase.table("users").select("*").eq("id", current_user["id"]).execute()
+        
+        if not user_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado"
+            )
+        
+        user = user_result.data[0]
+        
+        # Verificar se a senha atual está correta
+        if not AuthService.verify_password(update_data["current_password"], user["hashed_password"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Senha atual incorreta"
+            )
+        
         # Preparar dados para atualização
         update_fields = {}
         

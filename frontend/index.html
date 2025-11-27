@@ -96,7 +96,8 @@
                     <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers</p>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="text-right hidden md:block">
+                    <div class="text-right hidden md:block cursor-pointer hover:opacity-80 transition"
+                        id="userNameContainer">
                         <p class="text-sm text-purple-100">Olá,</p>
                         <p class="font-semibold" id="userName">Carregando...</p>
                     </div>
@@ -165,10 +166,32 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nova Senha (opcional)
+                                Nova Senha
                             </label>
                             <input type="password" id="newPassword" placeholder="Digite uma nova senha (opcional)"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Confirme Nova Senha
+                            </label>
+                            <input type="password" id="confirmPassword" placeholder="Digite a nova senha novamente"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <!-- Divisor -->
+                        <div class="border-t border-gray-200 pt-4">
+                            <p class="text-xs text-gray-500 mb-3">🔒 Para salvar qualquer alteração, insira sua senha
+                                atual:</p>
+                            <div>
+                                <label class="block text-sm font-medium text-red-600 mb-2">
+                                    Senha Atual *
+                                </label>
+                                <input type="password" id="currentPassword" placeholder="Digite sua senha atual"
+                                    required
+                                    class="w-full px-4 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            </div>
                         </div>
 
                         <div id="profileMessage" class="hidden text-sm p-3 rounded-lg"></div>
@@ -391,13 +414,13 @@
 
         // ================= MODAL DE PERFIL =================
         const profileModal = document.getElementById('profileModal');
-        const profileBtn = document.getElementById('profileBtn');
+        const userNameContainer = document.getElementById('userNameContainer');
         const closeProfileModal = document.getElementById('closeProfileModal');
         const updateProfileForm = document.getElementById('updateProfileForm');
         const profileMessage = document.getElementById('profileMessage');
 
-        // Abrir modal
-        profileBtn.addEventListener('click', async () => {
+        // Abrir modal ao clicar no nome do usuário
+        userNameContainer.addEventListener('click', async () => {
             profileModal.classList.remove('hidden');
             profileModal.classList.add('flex');
 
@@ -448,6 +471,14 @@
             const newFullName = document.getElementById('newFullName').value.trim();
             const newEmail = document.getElementById('newEmail').value.trim();
             const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value.trim();
+
+            // Validar senha atual (obrigatória)
+            if (!currentPassword) {
+                showProfileMessage('A senha atual é obrigatória para fazer alterações', 'error');
+                return;
+            }
 
             // Verificar se pelo menos um campo foi preenchido
             if (!newFullName && !newEmail && !newPassword) {
@@ -455,9 +486,20 @@
                 return;
             }
 
+            // Validar confirmação de senha
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    showProfileMessage('As senhas não coincidem. Verifique os campos "Nova Senha" e "Confirme Nova Senha"', 'error');
+                    return;
+                }
+            }
+
             try {
                 // Preparar dados para envio
-                const updateData = {};
+                const updateData = {
+                    current_password: currentPassword
+                };
+
                 if (newFullName) updateData.full_name = newFullName;
                 if (newEmail) updateData.email = newEmail;
                 if (newPassword) updateData.password = newPassword;
@@ -490,8 +532,8 @@
         function showProfileMessage(message, type) {
             profileMessage.textContent = message;
             profileMessage.className = `text-sm p-3 rounded-lg ${type === 'success'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
                 }`;
             profileMessage.classList.remove('hidden');
         }
@@ -501,6 +543,8 @@
             document.getElementById('newFullName').value = '';
             document.getElementById('newEmail').value = '';
             document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('currentPassword').value = '';
             profileMessage.classList.add('hidden');
         }
     </script>
