@@ -448,9 +448,16 @@
                     document.getElementById('currentName').textContent = result.data.full_name;
                     document.getElementById('currentEmail').textContent = result.data.email;
 
-                    // Preencher os campos de edição com os valores atuais
+                    // Atualizar apenas os placeholders (não preencher os campos)
                     document.getElementById('newFullName').placeholder = `Nome atual: ${result.data.full_name}`;
                     document.getElementById('newEmail').placeholder = `Email atual: ${result.data.email}`;
+
+                    // Garantir que os campos estejam vazios
+                    document.getElementById('newFullName').value = '';
+                    document.getElementById('newEmail').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    document.getElementById('currentPassword').value = '';
                 } else {
                     showProfileMessage('Erro ao carregar dados do usuário', 'error');
                 }
@@ -507,16 +514,21 @@
 
                 showProfileMessage('Perfil atualizado com sucesso!', 'success');
 
-                // Recarregar dados atuais após 1 segundo
+                // Fechar modal após 1.5 segundos (dar tempo para ver a mensagem)
                 setTimeout(async () => {
-                    await loadCurrentUserData();
-                    clearProfileForm();
+
 
                     // Atualizar o nome no header se foi alterado
                     if (newFullName) {
                         await displayUserName();
                     }
-                }, 2000);
+                    // Fechar modal
+                    profileModal.classList.add('hidden');
+                    profileModal.classList.remove('flex');
+
+                    // Limpar formulário
+                    clearProfileForm();
+                }, 1500);
 
             } catch (error) {
                 showProfileMessage(error.message || 'Erro ao atualizar perfil', 'error');
