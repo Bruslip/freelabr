@@ -1,112 +1,37 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreelaBR - Calculadora para Freelancers Brasileiros</title>
+
     <!-- PWA Meta Tags -->
     <meta name="description"
         content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
-    <meta name="theme-color" content="#667eea" id="theme-color-meta">
+    <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FreelaBR">
+
     <!-- PWA Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
     <link rel="apple-touch-icon" href="/icon-192.png">
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        /* CSS Variables para Dark Mode */
-        :root {
-            --bg-primary: #f9fafb;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f3f4f6;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-tertiary: #6b7280;
-            --border-color: #d1d5db;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --loading-overlay-bg: rgba(255, 255, 255, 0.95);
-        }
-
-        html.dark {
-            --bg-primary: #111827;
-            --bg-secondary: #1f2937;
-            --bg-tertiary: #374151;
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-tertiary: #9ca3af;
-            --border-color: #4b5563;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
-            --loading-overlay-bg: rgba(31, 41, 55, 0.95);
-        }
-
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
         }
 
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .bg-card {
-            background-color: var(--bg-secondary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .border-custom {
-            border-color: var(--border-color);
-        }
-
-        .text-primary {
-            color: var(--text-primary);
-        }
-
-        .text-secondary {
-            color: var(--text-secondary);
-        }
-
-        .text-tertiary {
-            color: var(--text-tertiary);
-        }
-
-        /* Dark Mode Toggle Button */
-        .theme-toggle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 20px;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        .theme-toggle:active {
-            transform: scale(0.95);
         }
 
         /* PWA Install Button */
@@ -132,794 +57,303 @@
             display: none;
             z-index: 999;
         }
-
-        /* Tooltip Styles */
-        .tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: help;
-            margin-left: 6px;
-            transition: all 0.2s;
-        }
-
-        .tooltip-icon:hover {
-            transform: scale(1.1);
-            background: #764ba2;
-        }
-
-        .tooltip-content {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            z-index: 10000;
-            bottom: 125%;
-            right: -10px;
-            transform: translateY(10px);
-            background: #1f2937;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            line-height: 1.5;
-            width: 250px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        /* Tooltip Mobile - Centralizado e menor */
-        @media (max-width: 768px) {
-            .tooltip-content {
-                width: 200px;
-                right: auto;
-                left: 50%;
-                transform: translateX(-50%) translateY(10px);
-                font-size: 12px;
-                padding: 10px;
-            }
-
-            .tooltip-container:hover .tooltip-content {
-                transform: translateX(-50%) translateY(0);
-            }
-
-            .tooltip-content::after {
-                left: 50% !important;
-                right: auto !important;
-                margin-left: -5px;
-            }
-        }
-
-        html.dark .tooltip-content {
-            background: #374151;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-        }
-
-        .tooltip-content::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            right: 20px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-
-        html.dark .tooltip-content::after {
-            border-color: #374151 transparent transparent transparent;
-        }
-
-        .tooltip-container:hover .tooltip-content {
-            visibility: visible;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Mobile Touch Targets - Mínimo 44px */
-        @media (max-width: 768px) {
-            .tooltip-icon {
-                width: 24px;
-                height: 24px;
-                font-size: 14px;
-            }
-
-            button {
-                min-height: 48px;
-                font-size: 16px;
-            }
-
-            input,
-            select {
-                min-height: 48px;
-                font-size: 16px;
-            }
-
-            .theme-toggle {
-                width: 52px;
-                height: 52px;
-                font-size: 24px;
-            }
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid white;
-            width: 20px;
-            height: 20px;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Fade In Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease forwards;
-        }
-
-        /* Pulse Animation for Results */
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .pulse-once {
-            animation: pulse 0.6s ease;
-        }
-
-        /* Slide Up Animation */
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-up {
-            animation: slideUp 0.5s ease forwards;
-        }
-
-        /* Number Counter Animation */
-        .counter {
-            transition: all 0.3s ease;
-        }
-
-        /* Enhanced Hover Effects */
-        .hover-lift {
-            transition: all 0.3s ease;
-        }
-
-        .hover-lift:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Smooth transitions for inputs */
-        input,
-        select {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-            transition: all 0.2s ease;
-        }
-
-        input:focus,
-        select:focus {
-            transform: translateY(-1px);
-            border-color: #667eea;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--loading-overlay-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            z-index: 50;
-        }
-
-        .loading-spinner {
-            border: 4px solid rgba(102, 126, 234, 0.2);
-            border-radius: 50%;
-            border-top: 4px solid #667eea;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        /* Mobile Improvements */
-        @media (max-width: 768px) {
-            .container {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            h2 {
-                font-size: 1.25rem;
-            }
-
-            .grid {
-                gap: 1rem;
-            }
-        }
-
-        /* Modal de Perfil */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            padding: 1rem;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9) translateY(-20px);
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .user-name-clickable {
-            cursor: pointer;
-            transition: all 0.2s ease;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .user-name-clickable:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .input-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .alert-error {
-            background: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-        }
-
-        .alert-success {
-            background: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border-color);
-            margin: 1.5rem 0;
-        }
-
-        .help-text {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            margin-top: 0.25rem;
-        }
     </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
     <!-- Offline Indicator -->
     <div id="offlineIndicator">
         📶 Você está offline. O app continuará funcionando!
     </div>
+
     <!-- Install Prompt -->
-    <div id="installPrompt" class="bg-card rounded-lg shadow-2xl p-4 max-w-sm">
+    <div id="installPrompt" class="bg-white rounded-lg shadow-2xl p-4 max-w-sm">
         <div class="flex items-start gap-3">
             <div class="text-4xl">📱</div>
             <div class="flex-1">
-                <h3 class="font-bold text-primary mb-1">Instalar FreelaBR</h3>
-                <p class="text-sm text-secondary mb-3">Adicione à tela inicial para acesso rápido!</p>
+                <h3 class="font-bold text-gray-800 mb-1">Instalar FreelaBR</h3>
+                <p class="text-sm text-gray-600 mb-3">Adicione à tela inicial para acesso rápido!</p>
                 <div class="flex gap-2">
                     <button id="installButton"
                         class="gradient-bg text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
                         Instalar
                     </button>
                     <button id="dismissButton"
-                        class="bg-tertiary text-primary px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80">
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300">
                         Agora não
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Header -->
     <header class="gradient-bg text-white py-6 shadow-lg">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold">🚀 FreelaBR</h1>
-                    <p class="text-purple-100 mt-1 text-sm md:text-base">Calculadora Completa para Freelancers
-                        Brasileiros</p>
+                    <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers</p>
                 </div>
-                <div class="flex items-center gap-2 md:gap-4">
-                    <!-- Dark Mode Toggle -->
-                    <div class="theme-toggle" id="themeToggle" title="Alternar tema">
-                        <span id="themeIcon">🌙</span>
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden md:block">
+                        <p class="text-sm text-purple-100">Olá,</p>
+                        <p class="font-semibold" id="userName">Carregando...</p>
                     </div>
-                    <!-- Nome do usuário - Mobile: apenas nome | Desktop: com "Olá" -->
-                    <div class="text-right user-name-clickable" id="userNameContainer"
-                        title="Clique para ver seu perfil">
-                        <p class="text-sm text-purple-100 hidden md:block">Olá,</p>
-                        <p class="font-semibold text-sm md:text-base" id="userName">Carregando...</p>
-                    </div>
+                    <button id="profileBtn"
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
+                        👤 Perfil
+                    </button>
                     <button id="logoutBtn"
-                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 md:px-4 py-2 rounded-lg font-semibold transition text-sm md:text-base">
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
                         Sair
                     </button>
                 </div>
             </div>
         </div>
     </header>
+
     <!-- Modal de Perfil -->
-    <div class="modal-overlay" id="profileModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="text-xl font-bold">👤 Meu Perfil</h3>
-                <button class="modal-close" id="closeProfileModal">×</button>
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <!-- Header do Modal -->
+            <div class="gradient-bg text-white p-6 rounded-t-lg">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">📝 Meu Perfil</h2>
+                    <button id="closeProfileModal" class="text-white hover:text-gray-200 text-2xl font-bold">
+                        ×
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <div id="profileAlert"></div>
-                <form id="profileForm">
-                    <!-- Informações Atuais -->
-                    <div class="bg-tertiary p-4 rounded-lg mb-6">
-                        <h4 class="font-semibold text-primary mb-2">📋 Informações Atuais</h4>
-                        <div class="text-sm space-y-1">
-                            <p class="text-secondary"><strong>Nome:</strong> <span id="currentName">-</span></p>
-                            <p class="text-secondary"><strong>Email:</strong> <span id="currentEmail">-</span></p>
+
+            <!-- Conteúdo do Modal -->
+            <div class="p-6 space-y-6">
+                <!-- Informações Atuais -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-3">📋 Informações Atuais</h3>
+                    <div class="space-y-2 text-sm">
+                        <div>
+                            <span class="text-gray-600">Nome:</span>
+                            <span class="font-medium text-gray-800 ml-2" id="currentName">Carregando...</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Email:</span>
+                            <span class="font-medium text-gray-800 ml-2" id="currentEmail">Carregando...</span>
                         </div>
                     </div>
-                    <!-- Formulário de Edição -->
-                    <h4 class="font-semibold text-primary mb-4">✏️ Editar Informações</h4>
-                    <div class="input-group">
-                        <label class="input-label">Nome Completo</label>
-                        <input type="text" id="newFullName" class="input-field"
-                            placeholder="Digite seu novo nome (opcional)">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Email</label>
-                        <input type="email" id="newEmail" class="input-field"
-                            placeholder="Digite seu novo email (opcional)">
-                    </div>
-                    <div class="divider"></div>
-                    <div class="input-group">
-                        <label class="input-label">Nova Senha (opcional)</label>
-                        <input type="password" id="newPassword" class="input-field"
-                            placeholder="Digite uma nova senha (opcional)">
-                        <p class="help-text">Mínimo 6 caracteres. Deixe em branco se não quiser alterar.</p>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Senha Atual <span style="color: #ef4444;">*</span></label>
-                        <input type="password" id="currentPassword" class="input-field"
-                            placeholder="Digite sua senha atual" required>
-                        <p class="help-text">Obrigatório para confirmar as alterações</p>
-                    </div>
-                    <button type="submit" class="btn-primary" id="updateProfileBtn">
-                        💾 Salvar Alterações
-                    </button>
-                </form>
+                </div>
+
+                <!-- Formulário de Edição -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">✏️ Editar Informações</h3>
+                    <form id="updateProfileForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Nome Completo
+                            </label>
+                            <input type="text" id="newFullName" placeholder="Digite seu novo nome (opcional)"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Email
+                            </label>
+                            <input type="email" id="newEmail" placeholder="Digite seu novo email (opcional)"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Nova Senha (opcional)
+                            </label>
+                            <input type="password" id="newPassword" placeholder="Digite uma nova senha (opcional)"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div id="profileMessage" class="hidden text-sm p-3 rounded-lg"></div>
+
+                        <button type="submit"
+                            class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">
+                            💾 Salvar Alterações
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <div class="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div class="grid md:grid-cols-2 gap-8">
             <!-- Form - Left Side -->
-            <div class="bg-card rounded-lg p-4 md:p-6 hover-lift relative">
-                <h2 class="text-2xl font-bold text-primary mb-6">📝 Seus Dados</h2>
-                <form id="calculatorForm" class="space-y-4 md:space-y-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Seus Dados</h2>
+
+                <form id="calculatorForm" class="space-y-6">
                     <!-- Pró-labore -->
                     <div>
-                        <label class="block text-sm font-medium text-secondary mb-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             💰 Quanto você quer ganhar por mês? (Pró-labore)
-                            <div class="tooltip-container">
-                                <span class="tooltip-icon">?</span>
-                                <div class="tooltip-content">
-                                    <strong>Pró-labore</strong> é o salário que você deseja retirar mensalmente do seu
-                                    negócio. Pense no valor líquido que você quer receber na conta para suas despesas
-                                    pessoais.
-                                </div>
-                            </div>
                         </label>
                         <input type="number" id="monthlyIncome" value="5000" min="1000" step="100"
-                            class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
+
                     <!-- Horas/Dias -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-secondary mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 ⏰ Horas por dia
-                                <div class="tooltip-container">
-                                    <span class="tooltip-icon">?</span>
-                                    <div class="tooltip-content">
-                                        Quantas horas você consegue trabalhar <strong>produtivamente</strong> por dia?
-                                        Considere apenas tempo real de trabalho, sem reuniões ou pausas.
-                                    </div>
-                                </div>
                             </label>
                             <input type="number" id="hoursPerDay" value="8" min="1" max="16"
-                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-secondary mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 📅 Dias por semana
-                                <div class="tooltip-container">
-                                    <span class="tooltip-icon">?</span>
-                                    <div class="tooltip-content">
-                                        Quantos dias por semana você pretende trabalhar? A maioria trabalha 5 dias
-                                        (seg-sex), mas você pode ajustar conforme sua rotina.
-                                    </div>
-                                </div>
                             </label>
                             <input type="number" id="daysPerWeek" value="5" min="1" max="7"
-                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                         </div>
                     </div>
+
                     <!-- Regime Tributário -->
                     <div>
-                        <label class="block text-sm font-medium text-secondary mb-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             🏛️ Regime Tributário
-                            <div class="tooltip-container">
-                                <span class="tooltip-icon">?</span>
-                                <div class="tooltip-content">
-                                    <strong>MEI:</strong> Até R$ 81k/ano, valor fixo mensal<br>
-                                    <strong>Simples:</strong> 6% a 33% sobre faturamento<br>
-                                    <strong>Presumido:</strong> ~16,33% fixo<br>
-                                    <strong>Autônomo:</strong> 20% INSS + IR progressivo
-                                </div>
-                            </div>
                         </label>
                         <select id="taxRegime"
-                            class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                             <option value="MEI">MEI - Microempreendedor Individual</option>
                             <option value="PJ_SIMPLES">PJ - Simples Nacional</option>
                             <option value="PJ_PRESUMIDO">PJ - Lucro Presumido</option>
                             <option value="AUTONOMO">Autônomo (Pessoa Física)</option>
                         </select>
-                        <p id="regimeInfo" class="text-xs text-tertiary mt-1"></p>
+                        <p id="regimeInfo" class="text-xs text-gray-500 mt-1"></p>
                     </div>
+
                     <!-- Despesas -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-secondary mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 💸 Despesas Fixas/mês
-                                <div class="tooltip-container">
-                                    <span class="tooltip-icon">?</span>
-                                    <div class="tooltip-content">
-                                        Custos fixos mensais: internet, software, contabilidade, aluguel de escritório,
-                                        etc.
-                                    </div>
-                                </div>
                             </label>
                             <input type="number" id="monthlyExpenses" value="500" min="0" step="50"
-                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-tertiary mt-1">Internet, software, etc.</p>
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-gray-500 mt-1">Internet, software, etc.</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-secondary mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 💳 Despesas Variáveis/mês
-                                <div class="tooltip-container">
-                                    <span class="tooltip-icon">?</span>
-                                    <div class="tooltip-content">
-                                        Custos que variam: transporte, materiais, cursos, equipamentos, etc.
-                                    </div>
-                                </div>
                             </label>
                             <input type="number" id="variableExpenses" value="200" min="0" step="50"
-                                class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-tertiary mt-1">Transporte, materiais, etc.</p>
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <p class="text-xs text-gray-500 mt-1">Transporte, materiais, etc.</p>
                         </div>
                     </div>
+
                     <!-- Provisões -->
                     <div class="space-y-2">
                         <label class="flex items-center">
                             <input type="checkbox" id="include13th" checked
                                 class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                            <span class="ml-2 text-sm text-secondary">Incluir 13º salário</span>
-                            <div class="tooltip-container ml-1">
-                                <span class="tooltip-icon">?</span>
-                                <div class="tooltip-content">
-                                    Reserva mensal para 13º salário. Representa 1/12 do seu pró-labore guardado todo
-                                    mês.
-                                </div>
-                            </div>
+                            <span class="ml-2 text-sm text-gray-700">Incluir 13º salário</span>
                         </label>
                         <label class="flex items-center">
                             <input type="checkbox" id="includeVacation" checked
                                 class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                            <span class="ml-2 text-sm text-secondary">Incluir férias + 1/3</span>
-                            <div class="tooltip-container ml-1">
-                                <span class="tooltip-icon">?</span>
-                                <div class="tooltip-content">
-                                    Reserva mensal para férias + adicional de 1/3. Garante que você possa tirar férias
-                                    sem perder renda.
-                                </div>
-                            </div>
+                            <span class="ml-2 text-sm text-gray-700">Incluir férias + 1/3</span>
                         </label>
                     </div>
+
                     <!-- Margem de Lucro -->
                     <div>
-                        <label class="block text-sm font-medium text-secondary mb-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             📈 Margem de Lucro: <span id="profitMarginValue">20</span>%
-                            <div class="tooltip-container">
-                                <span class="tooltip-icon">?</span>
-                                <div class="tooltip-content">
-                                    <strong>Margem de lucro</strong> é o percentual adicional sobre seus custos para
-                                    reinvestir no negócio, emergências e crescimento. Recomendado: 15-30%.
-                                </div>
-                            </div>
                         </label>
                         <input type="range" id="profitMargin" min="0" max="50" value="20"
-                            class="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer">
-                        <p class="text-xs text-tertiary mt-1">Recomendado: 15-30%</p>
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-gray-500 mt-1">Recomendado: 15-30%</p>
                     </div>
+
                     <button type="submit"
                         class="w-full gradient-bg text-white font-semibold py-3 rounded-lg hover:opacity-90 transition">
-                        <span id="calculateBtnText">🧮 Calcular Valores</span>
+                        🧮 Calcular Valores
                     </button>
                 </form>
-                <!-- Loading Overlay -->
-                <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-                    <div>
-                        <div class="loading-spinner mx-auto mb-4"></div>
-                        <p class="text-purple-600 font-semibold">Calculando...</p>
-                    </div>
-                </div>
             </div>
+
             <!-- Results - Right Side -->
-            <div id="resultsSection" class="space-y-4" style="display: none;">
+            <div id="resultsSection" class="space-y-4 hidden">
                 <!-- Valores Principais -->
-                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
-                    <h2 class="text-2xl font-bold text-primary mb-4">✅ Seus Valores</h2>
-                    <div class="grid grid-cols-2 gap-3 md:gap-4">
-                        <div
-                            class="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 p-3 md:p-4 rounded-lg hover-lift">
-                            <p class="text-xs md:text-sm text-purple-600 dark:text-purple-300 font-medium">POR HORA</p>
-                            <p class="text-xl md:text-3xl font-bold text-purple-900 dark:text-purple-100 counter"
-                                id="hourlyRate">R$ 0,00</p>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">✅ Seus Valores</h2>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
+                            <p class="text-sm text-purple-600 font-medium">POR HORA</p>
+                            <p class="text-3xl font-bold text-purple-900" id="hourlyRate">R$ 0,00</p>
                         </div>
-                        <div
-                            class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 p-3 md:p-4 rounded-lg hover-lift">
-                            <p class="text-xs md:text-sm text-blue-600 dark:text-blue-300 font-medium">POR DIA</p>
-                            <p class="text-xl md:text-3xl font-bold text-blue-900 dark:text-blue-100 counter"
-                                id="dailyRate">R$ 0,00</p>
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
+                            <p class="text-sm text-blue-600 font-medium">POR DIA</p>
+                            <p class="text-3xl font-bold text-blue-900" id="dailyRate">R$ 0,00</p>
                         </div>
-                        <div
-                            class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 p-3 md:p-4 rounded-lg hover-lift">
-                            <p class="text-xs md:text-sm text-green-600 dark:text-green-300 font-medium">POR SEMANA</p>
-                            <p class="text-xl md:text-3xl font-bold text-green-900 dark:text-green-100 counter"
-                                id="weeklyRate">R$ 0,00</p>
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                            <p class="text-sm text-green-600 font-medium">POR SEMANA</p>
+                            <p class="text-3xl font-bold text-green-900" id="weeklyRate">R$ 0,00</p>
                         </div>
-                        <div
-                            class="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 p-3 md:p-4 rounded-lg hover-lift">
-                            <p class="text-xs md:text-sm text-orange-600 dark:text-orange-300 font-medium">POR MÊS</p>
-                            <p class="text-xl md:text-3xl font-bold text-orange-900 dark:text-orange-100 counter"
-                                id="monthlyRate">R$ 0,00</p>
+                        <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg">
+                            <p class="text-sm text-orange-600 font-medium">POR MÊS</p>
+                            <p class="text-3xl font-bold text-orange-900" id="monthlyRate">R$ 0,00</p>
                         </div>
                     </div>
                 </div>
+
                 <!-- Projetos Sugeridos -->
-                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
-                    <h3 class="text-xl font-bold text-primary mb-4">📦 Valores para Projetos</h3>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📦 Valores para Projetos</h3>
                     <div class="space-y-3">
-                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
-                            <span class="text-secondary text-sm md:text-base">Projeto Pequeno (30h)</span>
-                            <span class="font-bold text-primary counter text-sm md:text-base" id="smallProject">R$
-                                0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Pequeno (30h)</span>
+                            <span class="font-bold text-gray-900" id="smallProject">R$ 0,00</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
-                            <span class="text-secondary text-sm md:text-base">Projeto Médio (100h)</span>
-                            <span class="font-bold text-primary counter text-sm md:text-base" id="mediumProject">R$
-                                0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Médio (100h)</span>
+                            <span class="font-bold text-gray-900" id="mediumProject">R$ 0,00</span>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-tertiary rounded-lg hover-lift">
-                            <span class="text-secondary text-sm md:text-base">Projeto Grande (200h)</span>
-                            <span class="font-bold text-primary counter text-sm md:text-base" id="largeProject">R$
-                                0,00</span>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Projeto Grande (200h)</span>
+                            <span class="font-bold text-gray-900" id="largeProject">R$ 0,00</span>
                         </div>
                     </div>
                 </div>
+
                 <!-- Breakdown de Custos -->
-                <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
-                    <h3 class="text-xl font-bold text-primary mb-4">📊 Detalhamento</h3>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Detalhamento</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-secondary">Pró-labore desejado:</span>
-                            <span class="font-semibold counter text-primary" id="netIncome">R$ 0,00</span>
+                            <span class="text-gray-600">Pró-labore desejado:</span>
+                            <span class="font-semibold" id="netIncome">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-secondary">Impostos mensais:</span>
-                            <span class="font-semibold text-red-600 dark:text-red-400 counter" id="monthlyTaxes">R$
-                                0,00</span>
+                            <span class="text-gray-600">Impostos mensais:</span>
+                            <span class="font-semibold text-red-600" id="monthlyTaxes">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-secondary">Provisões (13º + férias):</span>
-                            <span class="font-semibold counter text-primary" id="provisions">R$ 0,00</span>
+                            <span class="text-gray-600">Provisões (13º + férias):</span>
+                            <span class="font-semibold" id="provisions">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-secondary">Despesas totais:</span>
-                            <span class="font-semibold counter text-primary" id="totalExpenses">R$ 0,00</span>
+                            <span class="text-gray-600">Despesas totais:</span>
+                            <span class="font-semibold" id="totalExpenses">R$ 0,00</span>
                         </div>
-                        <div class="border-t border-custom pt-2 flex justify-between">
-                            <span class="text-primary font-bold">Custo Total/Mês:</span>
-                            <span class="font-bold text-purple-600 dark:text-purple-400 counter"
-                                id="totalMonthlyCost">R$ 0,00</span>
+                        <div class="border-t pt-2 flex justify-between">
+                            <span class="text-gray-800 font-bold">Custo Total/Mês:</span>
+                            <span class="font-bold text-purple-600" id="totalMonthlyCost">R$ 0,00</span>
                         </div>
-                        <div class="flex justify-between text-xs text-tertiary">
+                        <div class="flex justify-between text-xs text-gray-500">
                             <span>Horas trabalhadas/mês:</span>
                             <span id="workingHours">0h</span>
                         </div>
@@ -928,285 +362,164 @@
             </div>
         </div>
     </main>
+
     <!-- Footer -->
-    <footer class="bg-secondary py-6 mt-16">
+    <footer class="bg-gray-800 text-white py-6 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-primary">Made with ❤️ by <strong>MiniMax Agent</strong></p>
-            <p class="text-tertiary text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
+            <p class="text-gray-400 text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
         </div>
     </footer>
+
+    <!-- IMPORTANTE: auth.js deve ser carregado ANTES do app.js -->
     <script src="auth.js"></script>
     <script src="app.js"></script>
-    <!-- Dark Mode Script -->
+
+    <!-- Auth Check - CORRIGIDO -->
     <script>
-        // Detectar preferência do sistema
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        // Carregar preferência salva ou usar preferência do sistema
-        const savedTheme = localStorage.getItem('theme');
-        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-        // Aplicar tema inicial
-        if (initialTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.getElementById('themeIcon').textContent = '☀️';
-            document.getElementById('theme-color-meta').setAttribute('content', '#1f2937');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.getElementById('themeIcon').textContent = '🌙';
-            document.getElementById('theme-color-meta').setAttribute('content', '#667eea');
-        }
-        // Toggle do tema
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            if (isDark) {
-                document.documentElement.classList.remove('dark');
-                document.getElementById('themeIcon').textContent = '🌙';
-                document.getElementById('theme-color-meta').setAttribute('content', '#667eea');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                document.getElementById('themeIcon').textContent = '☀️';
-                document.getElementById('theme-color-meta').setAttribute('content', '#1f2937');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-    </script>
-    <!-- Auth Check -->
-    <script>
+        // Proteger a rota - redireciona se não estiver autenticado
         redirectIfNotAuthenticated();
+
+        // Carregar e exibir nome do usuário
         displayUserName();
+
+        // Botão de logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja sair?')) {
                 logout();
             }
         });
-    </script>
-    <!-- Profile Modal Script -->
-    <script>
-        const API_BASE_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:8000'
-            : 'https://freelabr.onrender.com';
+
+        // ================= MODAL DE PERFIL =================
         const profileModal = document.getElementById('profileModal');
+        const profileBtn = document.getElementById('profileBtn');
         const closeProfileModal = document.getElementById('closeProfileModal');
-        const userNameContainer = document.getElementById('userNameContainer');
-        const profileForm = document.getElementById('profileForm');
-        const profileAlert = document.getElementById('profileAlert');
-        // Abrir modal ao clicar no nome
-        userNameContainer.addEventListener('click', async () => {
-            await loadUserProfile();
-            profileModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        const updateProfileForm = document.getElementById('updateProfileForm');
+        const profileMessage = document.getElementById('profileMessage');
+
+        // Abrir modal
+        profileBtn.addEventListener('click', async () => {
+            profileModal.classList.remove('hidden');
+            profileModal.classList.add('flex');
+
+            // Carregar dados atuais do usuário
+            await loadCurrentUserData();
         });
+
         // Fechar modal
         closeProfileModal.addEventListener('click', () => {
-            closeModal();
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+            clearProfileForm();
         });
-        // Fechar ao clicar fora
+
+        // Fechar ao clicar fora do modal
         profileModal.addEventListener('click', (e) => {
             if (e.target === profileModal) {
-                closeModal();
+                profileModal.classList.add('hidden');
+                profileModal.classList.remove('flex');
+                clearProfileForm();
             }
         });
-        // Fechar com ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && profileModal.classList.contains('active')) {
-                closeModal();
-            }
-        });
-        function closeModal() {
-            profileModal.classList.remove('active');
-            document.body.style.overflow = '';
-            profileForm.reset();
-            profileAlert.innerHTML = '';
-        }
-        // Carregar dados do perfil
-        async function loadUserProfile() {
-            const token = localStorage.getItem('token');
+
+        // Carregar dados atuais do usuário
+        async function loadCurrentUserData() {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) throw new Error('Erro ao carregar perfil');
-                const userData = await response.json();
-                document.getElementById('currentName').textContent = userData.full_name;
-                document.getElementById('currentEmail').textContent = userData.email;
-                // Preencher campos com valores atuais
-                document.getElementById('newFullName').placeholder = userData.full_name;
-                document.getElementById('newEmail').placeholder = userData.email;
+                const result = await getCurrentUser();
+
+                if (result.success) {
+                    document.getElementById('currentName').textContent = result.data.full_name;
+                    document.getElementById('currentEmail').textContent = result.data.email;
+
+                    // Preencher os campos de edição com os valores atuais
+                    document.getElementById('newFullName').placeholder = `Nome atual: ${result.data.full_name}`;
+                    document.getElementById('newEmail').placeholder = `Email atual: ${result.data.email}`;
+                } else {
+                    showProfileMessage('Erro ao carregar dados do usuário', 'error');
+                }
             } catch (error) {
-                console.error('Erro ao carregar perfil:', error);
-                showAlert('Erro ao carregar dados do perfil', 'error');
+                showProfileMessage('Erro ao carregar dados do usuário', 'error');
             }
         }
-        // Atualizar perfil
-        profileForm.addEventListener('submit', async (e) => {
+
+        // Salvar alterações do perfil
+        updateProfileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const updateBtn = document.getElementById('updateProfileBtn');
-            const currentPassword = document.getElementById('currentPassword').value;
+
             const newFullName = document.getElementById('newFullName').value.trim();
             const newEmail = document.getElementById('newEmail').value.trim();
             const newPassword = document.getElementById('newPassword').value.trim();
-            // Validações
-            if (!currentPassword) {
-                showAlert('Senha atual é obrigatória', 'error');
-                return;
-            }
+
+            // Verificar se pelo menos um campo foi preenchido
             if (!newFullName && !newEmail && !newPassword) {
-                showAlert('Forneça pelo menos uma informação para atualizar', 'error');
+                showProfileMessage('Preencha pelo menos um campo para atualizar', 'error');
                 return;
             }
-            if (newPassword && newPassword.length < 6) {
-                showAlert('Nova senha deve ter no mínimo 6 caracteres', 'error');
-                return;
-            }
-            // Preparar dados
-            const updateData = {
-                current_password: currentPassword
-            };
-            if (newFullName) updateData.full_name = newFullName;
-            if (newEmail) updateData.email = newEmail;
-            if (newPassword) updateData.new_password = newPassword;
-            // Enviar para API
-            updateBtn.disabled = true;
-            updateBtn.innerHTML = '<span class="spinner"></span> Salvando...';
+
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+                // Preparar dados para envio
+                const updateData = {};
+                if (newFullName) updateData.full_name = newFullName;
+                if (newEmail) updateData.email = newEmail;
+                if (newPassword) updateData.password = newPassword;
+
+                // Fazer requisição de atualização
+                const response = await apiRequest('/api/auth/update-profile', {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify(updateData)
                 });
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.detail || 'Erro ao atualizar perfil');
-                }
-                // Sucesso!
-                showAlert('✅ Perfil atualizado com sucesso!', 'success');
-                // Atualizar nome na tela
-                if (result.user && result.user.full_name) {
-                    document.getElementById('userName').textContent = result.user.full_name;
-                }
-                // Limpar formulário
-                profileForm.reset();
-                // Recarregar dados
+
+                showProfileMessage('Perfil atualizado com sucesso!', 'success');
+
+                // Recarregar dados atuais após 1 segundo
                 setTimeout(async () => {
-                    await loadUserProfile();
+                    await loadCurrentUserData();
+                    clearProfileForm();
+
+                    // Atualizar o nome no header se foi alterado
+                    if (newFullName) {
+                        await displayUserName();
+                    }
                 }, 1000);
+
             } catch (error) {
-                console.error('Erro ao atualizar perfil:', error);
-                showAlert(error.message || 'Erro ao atualizar perfil', 'error');
-            } finally {
-                updateBtn.disabled = false;
-                updateBtn.innerHTML = '💾 Salvar Alterações';
+                showProfileMessage(error.message || 'Erro ao atualizar perfil', 'error');
             }
         });
-        function showAlert(message, type) {
-            const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
-            profileAlert.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
-            // Auto-hide após 5 segundos
-            setTimeout(() => {
-                profileAlert.innerHTML = '';
-            }, 5000);
+
+        // Mostrar mensagem no modal
+        function showProfileMessage(message, type) {
+            profileMessage.textContent = message;
+            profileMessage.className = `text-sm p-3 rounded-lg ${type === 'success'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`;
+            profileMessage.classList.remove('hidden');
+        }
+
+        // Limpar formulário
+        function clearProfileForm() {
+            document.getElementById('newFullName').value = '';
+            document.getElementById('newEmail').value = '';
+            document.getElementById('newPassword').value = '';
+            profileMessage.classList.add('hidden');
         }
     </script>
-    <!-- Enhanced Calculator Script with Animations -->
-    <script>
-        // Função para animar contadores
-        function animateCounter(element, start, end, duration) {
-            const range = end - start;
-            const increment = range / (duration / 16);
-            let current = start;
-            const timer = setInterval(() => {
-                current += increment;
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    current = end;
-                    clearInterval(timer);
-                }
-                element.textContent = current.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                });
-            }, 16);
-        }
-        function pulseResultCards() {
-            const cards = document.querySelectorAll('#resultsSection > div');
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.classList.add('pulse-once');
-                    setTimeout(() => card.classList.remove('pulse-once'), 600);
-                }, index * 100);
-            });
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('calculatorForm');
-            const resultsSection = document.getElementById('resultsSection');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            document.getElementById('profitMargin').addEventListener('input', (e) => {
-                document.getElementById('profitMarginValue').textContent = e.target.value;
-            });
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                loadingOverlay.style.display = 'flex';
-                resultsSection.style.display = 'none';
-                await new Promise(resolve => setTimeout(resolve, 800));
-                const formData = {
-                    desiredMonthlyIncome: parseFloat(document.getElementById('monthlyIncome').value),
-                    hoursPerDay: parseInt(document.getElementById('hoursPerDay').value),
-                    daysPerWeek: parseInt(document.getElementById('daysPerWeek').value),
-                    taxRegime: document.getElementById('taxRegime').value,
-                    monthlyExpenses: parseFloat(document.getElementById('monthlyExpenses').value),
-                    variableExpenses: parseFloat(document.getElementById('variableExpenses').value),
-                    include13th: document.getElementById('include13th').checked,
-                    includeVacation: document.getElementById('includeVacation').checked,
-                    profitMarginPercentage: parseFloat(document.getElementById('profitMargin').value),
-                    vacationWeeks: 4
-                };
-                const calculator = new FreelaBRCalculator();
-                const results = calculator.calculate(formData);
-                loadingOverlay.style.display = 'none';
-                resultsSection.style.display = 'block';
-                resultsSection.classList.add('fade-in');
-                animateCounter(document.getElementById('hourlyRate'), 0, results.hourlyRate, 1000);
-                animateCounter(document.getElementById('dailyRate'), 0, results.dailyRate, 1000);
-                animateCounter(document.getElementById('weeklyRate'), 0, results.weeklyRate, 1000);
-                animateCounter(document.getElementById('monthlyRate'), 0, results.monthlyRate, 1000);
-                animateCounter(document.getElementById('smallProject'), 0, results.projectSuggestions.small, 1000);
-                animateCounter(document.getElementById('mediumProject'), 0, results.projectSuggestions.medium, 1000);
-                animateCounter(document.getElementById('largeProject'), 0, results.projectSuggestions.large, 1000);
-                animateCounter(document.getElementById('netIncome'), 0, results.breakdown.netIncome, 1000);
-                animateCounter(document.getElementById('monthlyTaxes'), 0, results.breakdown.monthlyTaxes, 1000);
-                animateCounter(document.getElementById('provisions'), 0, results.breakdown.provisions, 1000);
-                animateCounter(document.getElementById('totalExpenses'), 0, results.breakdown.totalExpenses, 1000);
-                animateCounter(document.getElementById('totalMonthlyCost'), 0, results.breakdown.totalMonthlyCost, 1000);
-                document.getElementById('workingHours').textContent = Math.round(results.breakdown.workingHours) + 'h';
-                setTimeout(() => pulseResultCards(), 500);
-                // Scroll suave para resultados em mobile
-                if (window.innerWidth < 768) {
-                    setTimeout(() => {
-                        const yOffset = -20; // Offset para não colar no topo
-                        const element = resultsSection;
-                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                        window.scrollTo({ top: y, behavior: 'smooth' });
-                    }, 400);
-                }
-            });
-        });
-    </script>
+
     <!-- PWA Service Worker Registration -->
     <script>
+        // Registrar Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('✅ Service Worker registrado:', registration.scope);
+
+                        // Verificar atualizações
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nova versão disponível
                                     if (confirm('Nova versão disponível! Atualizar agora?')) {
                                         window.location.reload();
                                     }
@@ -1219,46 +532,68 @@
                     });
             });
         }
+
+        // PWA Install Prompt
         let deferredPrompt;
         const installPrompt = document.getElementById('installPrompt');
         const installButton = document.getElementById('installButton');
         const dismissButton = document.getElementById('dismissButton');
+
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevenir prompt automático
             e.preventDefault();
             deferredPrompt = e;
+
+            // Mostrar botão de instalação personalizado
             installPrompt.style.display = 'block';
+
+            // Esconder após 10 segundos se não interagir
             setTimeout(() => {
                 if (installPrompt.style.display === 'block') {
                     installPrompt.style.display = 'none';
                 }
             }, 10000);
         });
+
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) return;
+
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
+
             console.log(`Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar`);
+
             deferredPrompt = null;
             installPrompt.style.display = 'none';
         });
+
         dismissButton.addEventListener('click', () => {
             installPrompt.style.display = 'none';
         });
+
+        // Detectar se está rodando como PWA
         window.addEventListener('load', () => {
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
                 console.log('🚀 Rodando como PWA instalado!');
+                // Esconder botão de instalação se já estiver instalado
                 installPrompt.style.display = 'none';
             }
         });
+
+        // Detectar status online/offline
         const offlineIndicator = document.getElementById('offlineIndicator');
+
         window.addEventListener('online', () => {
             offlineIndicator.style.display = 'none';
             console.log('✅ Conexão restaurada');
         });
+
         window.addEventListener('offline', () => {
             offlineIndicator.style.display = 'block';
             console.log('⚠️ Sem conexão - modo offline ativado');
         });
+
+        // Verificar status inicial
         if (!navigator.onLine) {
             offlineIndicator.style.display = 'block';
         }

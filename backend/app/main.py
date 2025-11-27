@@ -215,6 +215,80 @@ async def get_me(current_user: dict = Depends(get_current_user)):
             detail=f"Erro ao buscar usuário: {str(e)}"
         )
 
+@app.put("/api/auth/update-profile")
+async def update_profile(
+    update_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Atualiza informações do perfil do usuário logado
+    Permite atualizar: full_name, email, password
+    """
+    if not supabase:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database não configurado"
+        )
+    
+    try:
+        # Preparar dados para atualização
+        update_fields = {}
+        
+        # Validar e adicionar campos permitidos
+        if "full_name" in update_data and update_data["full_name"]:
+            update_fields["full_name"] = update_data["full_name"].strip()
+        
+        if "email" in update_data and update_data["email"]:
+            new_email = update_data["email"].strip().lower()
+            
+            # Verificar se o novo email já está em uso por outro usuário
+            existing = supabase.table("users").select("id").eq("email", new_email).execute()
+            if existing.data and existing.data[0]["id"] != current_user["id"]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Este email já está em uso"
+                )
+            
+            update_fields["email"] = new_email
+        
+        if "password" in update_data and update_data["password"]:
+            # Hash da nova senha
+            hashed_password = AuthService.get_password_hash(update_data["password"])
+            update_fields["hashed_password"] = hashed_password
+        
+        # Verificar se há algo para atualizar
+        if not update_fields:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nenhum campo válido para atualizar"
+            )
+        
+        # Atualizar no banco
+        result = supabase.table("users").update(update_fields).eq("id", current_user["id"]).execute()
+        
+        if not result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado"
+            )
+        
+        # Retornar dados atualizados (sem senha)
+        updated_user = result.data[0]
+        return {
+            "id": updated_user["id"],
+            "email": updated_user["email"],
+            "full_name": updated_user["full_name"],
+            "message": "Perfil atualizado com sucesso"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao atualizar perfil: {str(e)}"
+        )
+
 # ==================== CALCULATOR ROUTES ====================
 
 @app.post("/api/calculator/calculate", response_model=CalculatorResult)
