@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>FreelaBR - Calculadora para Freelancers </title>
-
+    <title>FreelaBR - Calculadora para Freelancers</title>
     <!-- PWA Meta Tags -->
     <meta name="description"
         content="Calculadora completa de preços e gestão para freelancers brasileiros. Calcule seu valor/hora considerando impostos, despesas e provisões.">
@@ -13,15 +12,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FreelaBR">
-
     <!-- PWA Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
     <link rel="apple-touch-icon" href="/icon-192.png">
-
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -182,6 +178,28 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             pointer-events: none;
+        }
+
+        /* Tooltip Mobile - Centralizado e menor */
+        @media (max-width: 768px) {
+            .tooltip-content {
+                width: 200px;
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%) translateY(10px);
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .tooltip-container:hover .tooltip-content {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .tooltip-content::after {
+                left: 50% !important;
+                right: auto !important;
+                margin-left: -5px;
+            }
         }
 
         html.dark .tooltip-content {
@@ -391,7 +409,6 @@
     <div id="offlineIndicator">
         📶 Você está offline. O app continuará funcionando!
     </div>
-
     <!-- Install Prompt -->
     <div id="installPrompt" class="bg-card rounded-lg shadow-2xl p-4 max-w-sm">
         <div class="flex items-start gap-3">
@@ -412,7 +429,6 @@
             </div>
         </div>
     </div>
-
     <!-- Header -->
     <header class="gradient-bg text-white py-6 shadow-lg">
         <div class="container mx-auto px-4">
@@ -427,10 +443,10 @@
                     <div class="theme-toggle" id="themeToggle" title="Alternar tema">
                         <span id="themeIcon">🌙</span>
                     </div>
-
-                    <div class="text-right hidden md:block">
-                        <p class="text-sm text-purple-100">Olá,</p>
-                        <p class="font-semibold" id="userName">Carregando...</p>
+                    <!-- Nome do usuário - Mobile: apenas nome | Desktop: com "Olá" -->
+                    <div class="text-right">
+                        <p class="text-sm text-purple-100 hidden md:block">Olá,</p>
+                        <p class="font-semibold text-sm md:text-base" id="userName">Carregando...</p>
                     </div>
                     <button id="logoutBtn"
                         class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 md:px-4 py-2 rounded-lg font-semibold transition text-sm md:text-base">
@@ -440,14 +456,12 @@
             </div>
         </div>
     </header>
-
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid md:grid-cols-2 gap-6 md:gap-8">
             <!-- Form - Left Side -->
             <div class="bg-card rounded-lg p-4 md:p-6 hover-lift relative">
                 <h2 class="text-2xl font-bold text-primary mb-6">📝 Seus Dados</h2>
-
                 <form id="calculatorForm" class="space-y-4 md:space-y-6">
                     <!-- Pró-labore -->
                     <div>
@@ -465,7 +479,6 @@
                         <input type="number" id="monthlyIncome" value="5000" min="1000" step="100"
                             class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                     </div>
-
                     <!-- Horas/Dias -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -497,7 +510,6 @@
                                 class="w-full px-4 py-2 border border-custom rounded-lg focus:ring-2 focus:ring-purple-500">
                         </div>
                     </div>
-
                     <!-- Regime Tributário -->
                     <div>
                         <label class="block text-sm font-medium text-secondary mb-2">
@@ -521,7 +533,6 @@
                         </select>
                         <p id="regimeInfo" class="text-xs text-tertiary mt-1"></p>
                     </div>
-
                     <!-- Despesas -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -554,7 +565,6 @@
                             <p class="text-xs text-tertiary mt-1">Transporte, materiais, etc.</p>
                         </div>
                     </div>
-
                     <!-- Provisões -->
                     <div class="space-y-2">
                         <label class="flex items-center">
@@ -582,7 +592,6 @@
                             </div>
                         </label>
                     </div>
-
                     <!-- Margem de Lucro -->
                     <div>
                         <label class="block text-sm font-medium text-secondary mb-2">
@@ -599,13 +608,11 @@
                             class="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer">
                         <p class="text-xs text-tertiary mt-1">Recomendado: 15-30%</p>
                     </div>
-
                     <button type="submit"
                         class="w-full gradient-bg text-white font-semibold py-3 rounded-lg hover:opacity-90 transition">
                         <span id="calculateBtnText">🧮 Calcular Valores</span>
                     </button>
                 </form>
-
                 <!-- Loading Overlay -->
                 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
                     <div>
@@ -614,13 +621,11 @@
                     </div>
                 </div>
             </div>
-
             <!-- Results - Right Side -->
             <div id="resultsSection" class="space-y-4" style="display: none;">
                 <!-- Valores Principais -->
                 <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
                     <h2 class="text-2xl font-bold text-primary mb-4">✅ Seus Valores</h2>
-
                     <div class="grid grid-cols-2 gap-3 md:gap-4">
                         <div
                             class="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 p-3 md:p-4 rounded-lg hover-lift">
@@ -648,7 +653,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Projetos Sugeridos -->
                 <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
                     <h3 class="text-xl font-bold text-primary mb-4">📦 Valores para Projetos</h3>
@@ -670,7 +674,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Breakdown de Custos -->
                 <div class="bg-card rounded-lg p-4 md:p-6 hover-lift">
                     <h3 class="text-xl font-bold text-primary mb-4">📊 Detalhamento</h3>
@@ -706,26 +709,21 @@
             </div>
         </div>
     </main>
-
     <!-- Footer -->
     <footer class="bg-secondary py-6 mt-16">
         <div class="container mx-auto px-4 text-center">
             <p class="text-tertiary text-sm mt-2">© 2025 FreelaBR - Todos os direitos reservados</p>
         </div>
     </footer>
-
     <script src="auth.js"></script>
     <script src="app.js"></script>
-
     <!-- Dark Mode Script -->
     <script>
         // Detectar preferência do sistema
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
         // Carregar preferência salva ou usar preferência do sistema
         const savedTheme = localStorage.getItem('theme');
         const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-
         // Aplicar tema inicial
         if (initialTheme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -736,11 +734,9 @@
             document.getElementById('themeIcon').textContent = '🌙';
             document.getElementById('theme-color-meta').setAttribute('content', '#667eea');
         }
-
         // Toggle do tema
         document.getElementById('themeToggle').addEventListener('click', () => {
             const isDark = document.documentElement.classList.contains('dark');
-
             if (isDark) {
                 document.documentElement.classList.remove('dark');
                 document.getElementById('themeIcon').textContent = '🌙';
@@ -754,19 +750,16 @@
             }
         });
     </script>
-
     <!-- Auth Check -->
     <script>
         redirectIfNotAuthenticated();
         displayUserName();
-
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja sair?')) {
                 logout();
             }
         });
     </script>
-
     <!-- Enhanced Calculator Script with Animations -->
     <script>
         // Função para animar contadores
@@ -774,21 +767,18 @@
             const range = end - start;
             const increment = range / (duration / 16);
             let current = start;
-
             const timer = setInterval(() => {
                 current += increment;
                 if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
                     current = end;
                     clearInterval(timer);
                 }
-
                 element.textContent = current.toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
                 });
             }, 16);
         }
-
         function pulseResultCards() {
             const cards = document.querySelectorAll('#resultsSection > div');
             cards.forEach((card, index) => {
@@ -798,24 +788,18 @@
                 }, index * 100);
             });
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('calculatorForm');
             const resultsSection = document.getElementById('resultsSection');
             const loadingOverlay = document.getElementById('loadingOverlay');
-
             document.getElementById('profitMargin').addEventListener('input', (e) => {
                 document.getElementById('profitMarginValue').textContent = e.target.value;
             });
-
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 loadingOverlay.style.display = 'flex';
                 resultsSection.style.display = 'none';
-
                 await new Promise(resolve => setTimeout(resolve, 800));
-
                 const formData = {
                     desiredMonthlyIncome: parseFloat(document.getElementById('monthlyIncome').value),
                     hoursPerDay: parseInt(document.getElementById('hoursPerDay').value),
@@ -828,42 +812,37 @@
                     profitMarginPercentage: parseFloat(document.getElementById('profitMargin').value),
                     vacationWeeks: 4
                 };
-
                 const calculator = new FreelaBRCalculator();
                 const results = calculator.calculate(formData);
-
                 loadingOverlay.style.display = 'none';
                 resultsSection.style.display = 'block';
                 resultsSection.classList.add('fade-in');
-
                 animateCounter(document.getElementById('hourlyRate'), 0, results.hourlyRate, 1000);
                 animateCounter(document.getElementById('dailyRate'), 0, results.dailyRate, 1000);
                 animateCounter(document.getElementById('weeklyRate'), 0, results.weeklyRate, 1000);
                 animateCounter(document.getElementById('monthlyRate'), 0, results.monthlyRate, 1000);
-
                 animateCounter(document.getElementById('smallProject'), 0, results.projectSuggestions.small, 1000);
                 animateCounter(document.getElementById('mediumProject'), 0, results.projectSuggestions.medium, 1000);
                 animateCounter(document.getElementById('largeProject'), 0, results.projectSuggestions.large, 1000);
-
                 animateCounter(document.getElementById('netIncome'), 0, results.breakdown.netIncome, 1000);
                 animateCounter(document.getElementById('monthlyTaxes'), 0, results.breakdown.monthlyTaxes, 1000);
                 animateCounter(document.getElementById('provisions'), 0, results.breakdown.provisions, 1000);
                 animateCounter(document.getElementById('totalExpenses'), 0, results.breakdown.totalExpenses, 1000);
                 animateCounter(document.getElementById('totalMonthlyCost'), 0, results.breakdown.totalMonthlyCost, 1000);
-
                 document.getElementById('workingHours').textContent = Math.round(results.breakdown.workingHours) + 'h';
-
                 setTimeout(() => pulseResultCards(), 500);
-
+                // Scroll suave para resultados em mobile
                 if (window.innerWidth < 768) {
                     setTimeout(() => {
-                        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 300);
+                        const yOffset = -20; // Offset para não colar no topo
+                        const element = resultsSection;
+                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                    }, 400);
                 }
             });
         });
     </script>
-
     <!-- PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -871,7 +850,6 @@
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('✅ Service Worker registrado:', registration.scope);
-
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
                             newWorker.addEventListener('statechange', () => {
@@ -888,59 +866,46 @@
                     });
             });
         }
-
         let deferredPrompt;
         const installPrompt = document.getElementById('installPrompt');
         const installButton = document.getElementById('installButton');
         const dismissButton = document.getElementById('dismissButton');
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             installPrompt.style.display = 'block';
-
             setTimeout(() => {
                 if (installPrompt.style.display === 'block') {
                     installPrompt.style.display = 'none';
                 }
             }, 10000);
         });
-
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) return;
-
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-
             console.log(`Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar`);
-
             deferredPrompt = null;
             installPrompt.style.display = 'none';
         });
-
         dismissButton.addEventListener('click', () => {
             installPrompt.style.display = 'none';
         });
-
         window.addEventListener('load', () => {
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
                 console.log('🚀 Rodando como PWA instalado!');
                 installPrompt.style.display = 'none';
             }
         });
-
         const offlineIndicator = document.getElementById('offlineIndicator');
-
         window.addEventListener('online', () => {
             offlineIndicator.style.display = 'none';
             console.log('✅ Conexão restaurada');
         });
-
         window.addEventListener('offline', () => {
             offlineIndicator.style.display = 'block';
             console.log('⚠️ Sem conexão - modo offline ativado');
         });
-
         if (!navigator.onLine) {
             offlineIndicator.style.display = 'block';
         }
