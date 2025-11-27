@@ -652,6 +652,52 @@
             offlineIndicator.style.display = 'block';
         }
     </script>
+
+    <!-- Dark Mode Script -->
+    <script>
+        // ================= DARK MODE =================
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        // Verificar preferência salva ou preferência do sistema
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Aplicar tema inicial
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark');
+            darkModeToggle.textContent = '☀️';
+        } else {
+            body.classList.remove('dark');
+            darkModeToggle.textContent = '🌙';
+        }
+
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+
+            if (body.classList.contains('dark')) {
+                darkModeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                darkModeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Detectar mudança de preferência do sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    body.classList.add('dark');
+                    darkModeToggle.textContent = '☀️';
+                } else {
+                    body.classList.remove('dark');
+                    darkModeToggle.textContent = '🌙';
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
