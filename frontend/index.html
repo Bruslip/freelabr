@@ -96,15 +96,10 @@
                     <p class="text-purple-100 mt-1">Calculadora Completa para Freelancers</p>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="text-right hidden md:block cursor-pointer hover:opacity-80 transition"
-                        id="userNameContainer">
+                    <div class="text-right cursor-pointer hover:opacity-80 transition" id="userNameContainer">
                         <p class="text-sm text-purple-100">Olá,</p>
                         <p class="font-semibold" id="userName">Carregando...</p>
                     </div>
-                    <button id="profileBtn"
-                        class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
-                        👤 Perfil
-                    </button>
                     <button id="logoutBtn"
                         class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-semibold transition">
                         Sair
@@ -521,7 +516,7 @@
                     if (newFullName) {
                         await displayUserName();
                     }
-                }, 1000);
+                }, 2000);
 
             } catch (error) {
                 showProfileMessage(error.message || 'Erro ao atualizar perfil', 'error');
@@ -530,12 +525,15 @@
 
         // Mostrar mensagem no modal
         function showProfileMessage(message, type) {
-            profileMessage.textContent = message;
-            profileMessage.className = `text-sm p-3 rounded-lg ${type === 'success'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
+            const icon = type === 'success' ? '✅ ' : '❌ ';
+            profileMessage.textContent = icon + message;
+            profileMessage.className = `text-sm p-4 rounded-lg font-semibold ${type === 'success'
+                ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                : 'bg-red-100 text-red-700 border-2 border-red-300'
                 }`;
             profileMessage.classList.remove('hidden');
+            // Scroll para a mensagem ficar visível
+            profileMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         // Limpar formulário
