@@ -1,14 +1,12 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials
-from app.models import CalculatorInput, CalculatorResult, UserCreate, UserUpdate, User
+from app.models import CalculatorInput, CalculatorResult, UserCreate
 from app.services.calculator_service import CalculatorService
 from app.services.auth_service import AuthService
-from app.dependencies import get_current_user, security
+from app.dependencies import get_current_user
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from datetime import timedelta
 
 load_dotenv()
 
@@ -27,14 +25,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configurar CORS
+# Configurar CORS - CORRIGIDO
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+allowed_origins = [
+    frontend_url,
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "https://freelabr.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        os.getenv("FRONTEND_URL", "http://localhost:5173"),
-        "http://localhost:3000",
-        "https://*.vercel.app",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,9 +129,13 @@ async def register(user_data: UserCreate):
         )
 
 @app.post("/api/auth/login")
-async def login(email: str, password: str):
+async def login(
+    email: str = Form(...),
+    password: str = Form(...)
+):
     """
     Faz login e retorna token JWT
+    Aceita Form data do frontend HTML
     """
     if not supabase:
         raise HTTPException(
@@ -205,100 +213,6 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro ao buscar usuário: {str(e)}"
-        )
-
-@app.put("/api/users/me")
-async def update_profile(user_update: UserUpdate, current_user: dict = Depends(get_current_user)):
-    """
-    Atualiza dados do perfil do usuário
-    Requer senha atual para confirmar alterações
-    """
-    if not supabase:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Database não configurado"
-        )
-    
-    try:
-        # Busca usuário atual com senha
-        result = supabase.table("users").select("*").eq("id", current_user["id"]).execute()
-        
-        if not result.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Usuário não encontrado"
-            )
-        
-        user = result.data[0]
-        
-        # Valida senha atual
-        if not AuthService.verify_password(user_update.current_password, user["hashed_password"]):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Senha atual incorreta"
-            )
-        
-        # Prepara dados para atualização
-        update_data = {}
-        
-        # Atualiza nome se fornecido
-        if user_update.full_name is not None and user_update.full_name.strip():
-            update_data["full_name"] = user_update.full_name.strip()
-        
-        # Atualiza email se fornecido e diferente do atual
-        if user_update.email is not None and user_update.email != user["email"]:
-            # Verifica se novo email já existe
-            existing = supabase.table("users").select("*").eq("email", user_update.email).execute()
-            if existing.data:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Este email já está em uso"
-                )
-            update_data["email"] = user_update.email
-        
-        # Atualiza senha se fornecida
-        if user_update.new_password is not None and user_update.new_password.strip():
-            if len(user_update.new_password) < 6:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Nova senha deve ter no mínimo 6 caracteres"
-                )
-            update_data["hashed_password"] = AuthService.get_password_hash(user_update.new_password)
-        
-        # Verifica se há algo para atualizar
-        if not update_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Nenhuma alteração foi fornecida"
-            )
-        
-        # Atualiza no banco
-        update_result = supabase.table("users").update(update_data).eq("id", current_user["id"]).execute()
-        
-        if not update_result.data:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Erro ao atualizar perfil"
-            )
-        
-        updated_user = update_result.data[0]
-        
-        return {
-            "success": True,
-            "message": "Perfil atualizado com sucesso",
-            "user": {
-                "id": updated_user["id"],
-                "email": updated_user["email"],
-                "full_name": updated_user["full_name"]
-            }
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao atualizar perfil: {str(e)}"
         )
 
 # ==================== CALCULATOR ROUTES ====================
